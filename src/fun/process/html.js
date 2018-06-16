@@ -1,6 +1,24 @@
 const cheerio = require('cheerio');
 const iconv = require('iconv-lite');
 const oTitles = {};
+const isEmpty = function (_input) {
+    if (_input === null) {
+        return true;
+    }
+    if (_input === undefined) {
+        return true;
+    }
+    if (_input === false) {
+        return true;
+    }
+    if (_input === '') {
+        return true;
+    }
+    if (_input === 0) {
+        return true;
+    }
+    return false;
+};
 const getHtml = function (_bHtml, _charset, outObj) {
     //第一次先去判断header里的charset是否有效
     if (checkCharset(_bHtml, _charset, outObj)) {
@@ -39,10 +57,7 @@ const getHtml = function (_bHtml, _charset, outObj) {
     return false;
 };
 const checkCharset = function (_bHtml, _charset, outObj) {
-    if (_charset === undefined) {
-        return false;
-    }
-    if (!_charset) {
+    if (isEmpty(_charset)) {
         return false;
     }
     if (_charset.toLowerCase() === 'utf8') {
@@ -62,24 +77,6 @@ const checkCharset = function (_bHtml, _charset, outObj) {
     return false;
 };
 module.exports = (_bHtml, oResHeader) => {
-    const isEmpty = function (_input) {
-        if (_input === null) {
-            return true;
-        }
-        if (_input === undefined) {
-            return true;
-        }
-        if (_input === false) {
-            return true;
-        }
-        if (_input === '') {
-            return true;
-        }
-        if (_input === 0) {
-            return true;
-        }
-        return false;
-    };
     const outObj = {};
     // 从Header取得编码（例如utf-8或gbk之类的）
     const _charset = oResHeader.charset();
