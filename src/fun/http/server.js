@@ -3,14 +3,16 @@ const url = require('url');
 module.exports = (oFun, config) => {
     // Create an HTTP server
     const httpsrv = http.createServer((httpsrv_req, httpsrv_res) => {
-        const urlinfo = url.parse(httpsrv_req.url);
+        const urlinfo = url.parse(httpsrv_req.url); // 取得用户要访问的URL
         const remoteAddress = httpsrv_res.socket.remoteAddress;
         const remotePort = httpsrv_res.socket.remotePort;
         const remoteSocket = remoteAddress + ':' + remotePort;
-        var realIP = httpsrv_res.socket.remoteAddress;
+        var realIP = remoteAddress; // 腾讯云CDN请求过来的IP
         if (httpsrv_req.headers.hasOwnProperty('x-forwarded-for')) {
-            realIP = httpsrv_req.headers['x-forwarded-for'];//获取真实IP
+            // 从腾讯云CDN获得用户的真实IP
+            realIP = httpsrv_req.headers['x-forwarded-for'];
         }
+        // 告知后端WEB服务器的用户真实IP
         httpsrv_req.headers['x-real-ip'] = realIP;
         let realProto = 'http';
         if (httpsrv_req.headers.hasOwnProperty('x-forwarded-proto')) {

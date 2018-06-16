@@ -4,6 +4,7 @@ const oTitles = {};
 const getHtml = function (_bHtml, _charset, outObj) {
     //第一次先去判断header里的charset是否有效
     if (checkCharset(_bHtml, _charset, outObj)) {
+        outObj.charset = _charset;
         //有效就直接返回sHTML了
         return true;
     }
@@ -11,6 +12,7 @@ const getHtml = function (_bHtml, _charset, outObj) {
     outObj.charset = '';
     //第二次去尝试<meta charset="utf-8">
     const sHtml = _bHtml.toString();
+    // 全转小写，这样对大小写不敏感了
     const $ = cheerio.load(sHtml.toLowerCase());
     let meta_charset = $("meta[charset!='']").attr('charset');
     if (checkCharset(_bHtml, meta_charset, outObj)) {
@@ -51,7 +53,8 @@ const checkCharset = function (_bHtml, _charset, outObj) {
         return true;
     }
     try {
-        outObj.sHtml = iconv.decode(_bHtml, _charset);//使用GBK解码
+        // 既然不是utf-8编码, 就转换成utf-8
+        outObj.sHtml = iconv.decode(_bHtml, _charset);
         return true;
     } catch (err) {
         console.error(err);
@@ -59,23 +62,44 @@ const checkCharset = function (_bHtml, _charset, outObj) {
     return false;
 };
 module.exports = (_bHtml, oResHeader) => {
+    const isEmpty = function (_input) {
+        if (_input === null) {
+            return true;
+        }
+        if (_input === undefined) {
+            return true;
+        }
+        if (_input === false) {
+            return true;
+        }
+        if (_input === '') {
+            return true;
+        }
+        if (_input === 0) {
+            return true;
+        }
+        return false;
+    };
     const outObj = {};
+    // 从Header取得编码（例如utf-8或gbk之类的）
     const _charset = oResHeader.charset();
     if (getHtml(_bHtml, _charset, outObj)) {
         //找到编码
-        if (!_charset && outObj.charset) {
+        if (isEmpty(_charset) && !isEmpty(outObj.charset)) {
             oResHeader.charset(outObj.charset);
         }
     }
+    // console.info(outObj.charset, oResHeader.realURL);
     const $ = cheerio.load(outObj.sHtml);
     const title = $('title').text();
     if (oTitles.hasOwnProperty(title)) {
+        // 重复的标题不记录
         oTitles[title]++;
     } else {
         oTitles[title] = 0;
         console.debug(outObj.charset, oResHeader.statusCode, title, oResHeader.realURL);
     }
-    if (outObj.charset && outObj.charset !== 'utf-8') {
+    if (!isEmpty(outObj.charset) && outObj.charset !== 'utf-8') {
         //编码转换回用户网站原有的编码
         return iconv.encode(outObj.sHtml, outObj.charset);
     }

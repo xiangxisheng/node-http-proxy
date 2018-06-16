@@ -19,7 +19,12 @@ global.config = config;
 console.info(config);
 oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
     const oStr = oClass.common.string();
-    const host = httpsrv_req.headers.host.split(':')[0];
+    if (!httpsrv_req.headers.hasOwnProperty('host')) {
+        console.info('have no host in httpsrv_req.headers');
+        return;
+    }
+    var host = httpsrv_req.headers.host;
+    host = host.split(':')[0];
     oStr.setSource(host);
     oStr.setSuffix('.http81.firadio.net');
     let httpreq;

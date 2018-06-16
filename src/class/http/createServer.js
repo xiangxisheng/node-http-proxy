@@ -17,7 +17,7 @@ module.exports = (config, _callBack) => {
             realProto = httpsrv_req.headers['x-forwarded-proto'];//客户请求的协议
         }
         const loguuid = httpsrv_req.headers['x-nws-log-uuid'];
-		const host = httpsrv_req.headers.host;
+        const host = httpsrv_req.headers.host;
         httpsrv_req.realURL = realProto + '://' + host + httpsrv_req.url;
         global.oFun.log.site(global.oFun, config, host, `${remoteSocket}\t${realIP}\t[${realProto}]${urlinfo.pathname}[${httpsrv_req.method}]`);
         _callBack(httpsrv_req, httpsrv_res);
