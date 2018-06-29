@@ -4,10 +4,28 @@ module.exports = (config, _callBack) => {
     // Create an HTTP server
     const httpsrv = http.createServer((httpsrv_req, httpsrv_res) => {
         const urlinfo = url.parse(httpsrv_req.url);
-        const remoteAddress = httpsrv_res.socket.remoteAddress;
-        const remotePort = httpsrv_res.socket.remotePort;
+        if (0 && !httpsrv_res.hasOwnProperty('socket')) {
+            console.info('have no socket in httpsrv_res');
+            httpsrv_res.end('have no socket in httpsrv_res');
+            return;
+        }
+        if (0 && !httpsrv_req.hasOwnProperty('connection')) {
+            console.info('have no connection in httpsrv_req');
+            httpsrv_res.end('have no connection in httpsrv_req');
+            return;
+        }
+        var remoteAddress = '0.0.0.0';
+        var remotePort = 0;
+        if (httpsrv_res.socket.remoteAddress) {
+            remoteAddress = httpsrv_res.socket.remoteAddress;
+            remotePort = httpsrv_res.socket.remotePort;
+        } else
+        if (httpsrv_req.connection.remoteAddress) {
+            remoteAddress = httpsrv_req.connection.remoteAddress;
+            remotePort = httpsrv_req.connection.remotePort;
+        }
         const remoteSocket = remoteAddress + ':' + remotePort;
-        var realIP = httpsrv_res.socket.remoteAddress;
+        var realIP = remoteAddress;
         if (httpsrv_req.headers.hasOwnProperty('x-forwarded-for')) {
             realIP = httpsrv_req.headers['x-forwarded-for'];//获取真实IP
         }
@@ -16,10 +34,11 @@ module.exports = (config, _callBack) => {
         if (httpsrv_req.headers.hasOwnProperty('x-forwarded-proto')) {
             realProto = httpsrv_req.headers['x-forwarded-proto'];//客户请求的协议
         }
+        realProto = realProto.replace(/^\s+/g, '').replace(/\s+$/g, '').toLowerCase();
         const loguuid = httpsrv_req.headers['x-nws-log-uuid'];
         const host = httpsrv_req.headers.host;
         httpsrv_req.realURL = realProto + '://' + host + httpsrv_req.url;
-        global.oFun.log.site(global.oFun, config, host, `${remoteSocket}\t${realIP}\t[${realProto}]${urlinfo.pathname}[${httpsrv_req.method}]`);
+        // global.oFun.log.site(global.oFun, config, host, `${remoteSocket}\t${realIP}\t[${realProto}]${urlinfo.pathname}[${httpsrv_req.method}]`);
         _callBack(httpsrv_req, httpsrv_res);
     });
     httpsrv.on('connect', (req, cltSocket, head) => {

@@ -29,6 +29,9 @@ module.exports = function (_headers) {
         return headers[ucfirst(key)];
     };
     oPublic.set = (key, value) => {
+        if (value === undefined) {
+            return;
+        }
         key = ucfirst(key);
         headers[key] = value;
         if (key === ucfirst('content-type')) {
