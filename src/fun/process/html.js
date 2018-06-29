@@ -76,15 +76,30 @@ const checkCharset = function (_bHtml, _charset, outObj) {
     }
     return false;
 };
+const urlParse = function (srcfile) {
+    const ret = {};
+    ret.host = '';
+    ret.path = srcfile;
+    const arr = ['//', 'http://', 'https://'];
+    for (let i = 0; i < arr.length; i++) {
+        const v = arr[i];
+        if (srcfile.indexOf(v) === 0) {
+            const sub1 = v.length;
+            const sub2 = srcfile.indexOf('/', sub1);
+            if (sub2 !== -1) {
+                ret.host = srcfile.substring(sub1, sub2);
+                ret.path = srcfile.substr(sub2);
+                break;
+            }
+        }
+    }
+    return ret;
+};
 const setSrcPath = function (oResHeader, src, field, that) {
     var newurl = oResHeader.realProto + '://' + oResHeader.fastHost;
-    if (src.indexOf('//') === 0) {
-        return;
-    }
-    if (src.indexOf('http://') === 0) {
-        return;
-    }
-    if (src.indexOf('https://') === 0) {
+    const srcinfo = urlParse(src);
+    src = srcinfo.path;
+    if (srcinfo.host && srcinfo.host !== oResHeader.urlinfo.host) {
         return;
     }
     if (src.indexOf('/') === 0) {

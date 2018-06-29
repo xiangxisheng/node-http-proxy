@@ -60,6 +60,7 @@ module.exports = (oFun, config) => {
         realProto = realProto.replace(/^\s+/g, '').replace(/\s+$/g, '').toLowerCase();
         const loguuid = httpsrv_req.headers['x-nws-log-uuid'];
         const host = httpsrv_req.headers.host;
+        urlinfo.host = host;
         httpsrv_req.realURL = realProto + '://' + host + httpsrv_req.url;
         httpsrv_req.fastHost = getNewHost(host);
         httpsrv_req.realProto = realProto;
