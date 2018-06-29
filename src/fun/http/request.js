@@ -24,9 +24,17 @@ module.exports = (oFun, config, httpsrv_res, httpsrv_req) => {
         oResHeader.set('Connection', 'keep-alive');//保持长连接
         oResHeader.del('Server');
         oResHeader.del('X-Powered-By');
+        if (1) {
+            oResHeader.del('Content-Security-Policy');
+            oResHeader.del('X-Content-Security-Policy');
+            oResHeader.del('X-Webkit-Csp');
+        }
         oResHeader.statusCode = httpreq_res.statusCode;//WEB返回的状态号码
         oResHeader.statusMessage = httpreq_res.statusMessage;//WEB返回的状态消息
         oResHeader.realURL = httpsrv_req.realURL;//用户请求的URL
+        oResHeader.fastHost = httpsrv_req.fastHost;
+        oResHeader.realProto = httpsrv_req.realProto;
+        oResHeader.urlinfo = httpsrv_req.urlinfo;
         //const httpreq_oInfo = oFun.http.getInfoByWebRes(httpsrv_req, httpreq_res, oResHeader);
         var sGzipFlag = 'ignore';
         const is200 = (httpreq_res.statusCode === 200);

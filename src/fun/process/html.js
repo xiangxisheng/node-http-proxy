@@ -76,6 +76,28 @@ const checkCharset = function (_bHtml, _charset, outObj) {
     }
     return false;
 };
+const setSrcPath = function (oResHeader, src, field, that) {
+    var newurl = oResHeader.realProto + '://' + oResHeader.fastHost;
+    if (src.indexOf('//') === 0) {
+        return;
+    }
+    if (src.indexOf('http://') === 0) {
+        return;
+    }
+    if (src.indexOf('https://') === 0) {
+        return;
+    }
+    if (src.indexOf('/') === 0) {
+        that.attr(field, newurl + src);
+        return;
+    }
+    if (src.indexOf('./') === 0) {
+        var src2 = src.substr(2);
+        that.attr(field, newurl + oResHeader.urlinfo.dirname + '/' + src2);
+        return;
+    }
+    that.attr(field, newurl + oResHeader.urlinfo.dirname + '/' + src);
+};
 module.exports = (_bHtml, oResHeader) => {
     const outObj = {};
     // 从Header取得编码（例如utf-8或gbk之类的）
@@ -95,6 +117,21 @@ module.exports = (_bHtml, oResHeader) => {
     } else {
         oTitles[title] = 0;
         console.debug(outObj.charset, oResHeader.statusCode, title, oResHeader.realURL);
+    }
+    if (oResHeader.realProto === 'http') {
+        $("[src!='']").each(function(i, elem) {
+            let src = $(this).attr('src');
+            setSrcPath(oResHeader, src, 'src', $(this));
+        });
+        $("link[href!='']").each(function(i, elem) {
+            let href = $(this).attr('href');
+            setSrcPath(oResHeader, href, 'href', $(this));
+        });
+        $("script[href!='']").each(function(i, elem) {
+            let href = $(this).attr('href');
+            setSrcPath(oResHeader, href, 'href', $(this));
+        });
+        outObj.sHtml = $.html();
     }
     if (!isEmpty(outObj.charset) && outObj.charset !== 'utf-8') {
         //编码转换回用户网站原有的编码

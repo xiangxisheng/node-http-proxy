@@ -22,9 +22,27 @@ module.exports = (oFun, config) => {
         // console.log(extname);
         return true;
     };
+    const getNewHost = function (host) {
+        if (host === undefined) {
+            return '';
+        }
+        host = host.replace(/\-/g, ',');
+        host = host.replace(/\./g, '-');
+        host = host.replace(/\,/g, '--');
+        host += '.feieryun.net:8001';
+        return host;
+    };
+    const getDirname = function (pathname) {
+        pathname = pathname.replace(/\/$/, '');
+        if (path.extname(pathname) === '') {
+            return pathname;
+        }
+        return path.dirname(pathname);
+    };
     // Create an HTTP server
     const httpsrv = http.createServer((httpsrv_req, httpsrv_res) => {
         const urlinfo = url.parse(httpsrv_req.url); // 取得用户要访问的URL
+        urlinfo.dirname = getDirname(urlinfo.pathname);
         const remoteAddress = httpsrv_res.socket.remoteAddress;
         const remotePort = httpsrv_res.socket.remotePort;
         const remoteSocket = remoteAddress + ':' + remotePort;
@@ -41,16 +59,15 @@ module.exports = (oFun, config) => {
         }
         realProto = realProto.replace(/^\s+/g, '').replace(/\s+$/g, '').toLowerCase();
         const loguuid = httpsrv_req.headers['x-nws-log-uuid'];
-        httpsrv_req.realURL = realProto + '://' + httpsrv_req.headers.host + httpsrv_req.url;
+        const host = httpsrv_req.headers.host;
+        httpsrv_req.realURL = realProto + '://' + host + httpsrv_req.url;
+        httpsrv_req.fastHost = getNewHost(host);
+        httpsrv_req.realProto = realProto;
+        httpsrv_req.urlinfo = urlinfo;
         //console.log(uuid + "\r\n" + httpsrv_req.realURL);
         //fun.log(`${realip}\t${proto}://${httpsrv_req.headers.host}${urlinfo.pathname}[${httpsrv_req.method}]`);
-        const host = httpsrv_req.headers.host;
         if (realProto === 'http' && httpsrv_req.method === 'GET' && isFileDL(urlinfo)) {
-            var newhost = host;
-            newhost = newhost.replace(/\-/g, ',');
-            newhost = newhost.replace(/\./g, '-');
-            newhost = newhost.replace(/\,/g, '--');
-            var newurl = realProto + '://' + newhost + '.feieryun.net:8001' + httpsrv_req.url;
+            var newurl = realProto + '://' + httpsrv_req.fastHost + httpsrv_req.url;
             // console.log(newurl);
             httpsrv_res.writeHead(302, {'Location': newurl});
             httpsrv_res.end();
