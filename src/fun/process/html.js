@@ -96,7 +96,8 @@ const urlParse = function (srcfile) {
     return ret;
 };
 const setSrcPath = function (oResHeader, src, field, that) {
-    var newurl = oResHeader.realProto + '://' + oResHeader.fastHost;
+    const port = (oResHeader.realProto === 'http') ? 8001 : 4431;
+    var newurl = oResHeader.realProto + '://' + oResHeader.fastHost + ':' + port;
     const srcinfo = urlParse(src);
     src = srcinfo.path;
     if (srcinfo.host && srcinfo.host !== oResHeader.urlinfo.host) {
@@ -133,7 +134,7 @@ module.exports = (_bHtml, oResHeader) => {
         oTitles[title] = 0;
         console.debug(outObj.charset, oResHeader.statusCode, title, oResHeader.realURL);
     }
-    if (oResHeader.realProto === 'http') {
+    if (1 || oResHeader.realProto === 'http') {
         $("[src!='']").each(function(i, elem) {
             let src = $(this).attr('src');
             setSrcPath(oResHeader, src, 'src', $(this));

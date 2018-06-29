@@ -29,7 +29,7 @@ module.exports = (oFun, config) => {
         host = host.replace(/\-/g, ',');
         host = host.replace(/\./g, '-');
         host = host.replace(/\,/g, '--');
-        host += '.feieryun.net:8001';
+        host += '.feieryun.net';
         return host;
     };
     const getDirname = function (pathname) {
@@ -67,8 +67,9 @@ module.exports = (oFun, config) => {
         httpsrv_req.urlinfo = urlinfo;
         //console.log(uuid + "\r\n" + httpsrv_req.realURL);
         //fun.log(`${realip}\t${proto}://${httpsrv_req.headers.host}${urlinfo.pathname}[${httpsrv_req.method}]`);
-        if (realProto === 'http' && httpsrv_req.method === 'GET' && isFileDL(urlinfo)) {
-            var newurl = realProto + '://' + httpsrv_req.fastHost + httpsrv_req.url;
+        if (httpsrv_req.method === 'GET' && isFileDL(urlinfo)) {
+            const port = (realProto === 'http') ? 8001 : 4431;
+            var newurl = realProto + '://' + httpsrv_req.fastHost + ':' + port + httpsrv_req.url;
             // console.log(newurl);
             httpsrv_res.writeHead(302, {'Location': newurl});
             httpsrv_res.end();
