@@ -2,6 +2,7 @@
 
 const zlib = require('zlib');
 const path = require('path');
+const fs = require('fs');
 const oFun = require(__dirname + '/../src/fun.js');
 global.oFun = oFun;
 const oClass = require(__dirname + '/../src/class.js');
@@ -20,6 +21,9 @@ config.max_size_mb = 0.8;//限制文件大小(MB)
 config.max_size_byte = 1024 * 1024 * config.max_size_mb;
 config.limit_gzsize_mb = 0.3;//限制GZ压缩后的大小(MB)
 config.limit_gzsize_byte = 1024 * 1024 * config.limit_gzsize_mb;
+
+config.key = fs.readFileSync('cert/feieryun.net.key');
+config.cert = fs.readFileSync('cert/feieryun.net.cer');
 
 global.config = config;
 console.info(config);

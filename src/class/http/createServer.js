@@ -1,8 +1,9 @@
 const http = require('http');
+const https = require('https');
 const url = require('url');
 module.exports = (config, _callBack) => {
     // Create an HTTP server
-    const httpsrv = http.createServer((httpsrv_req, httpsrv_res) => {
+    const callback = (httpsrv_req, httpsrv_res) => {
         const urlinfo = url.parse(httpsrv_req.url);
         if (0 && !httpsrv_res.hasOwnProperty('socket')) {
             console.info('have no socket in httpsrv_res');
@@ -40,7 +41,8 @@ module.exports = (config, _callBack) => {
         httpsrv_req.realURL = realProto + '://' + host + httpsrv_req.url;
         // global.oFun.log.site(global.oFun, config, host, `${remoteSocket}\t${realIP}\t[${realProto}]${urlinfo.pathname}[${httpsrv_req.method}]`);
         _callBack(httpsrv_req, httpsrv_res);
-    });
+    };
+    let httpsrv = (config.listen_port.toString().indexOf('443') === 0) ? https.createServer(config, callback) : http.createServer(callback);
     httpsrv.on('connect', (req, cltSocket, head) => {
         // connect to an origin server
         console.info('connect to an origin server');

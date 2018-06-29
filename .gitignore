@@ -66,3 +66,6 @@ nbproject/
 *~
 *.exe
 
+*.key
+*.cer
+
