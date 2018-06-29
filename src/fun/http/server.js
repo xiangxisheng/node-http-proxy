@@ -39,12 +39,13 @@ module.exports = (oFun, config) => {
         if (httpsrv_req.headers.hasOwnProperty('x-forwarded-proto')) {
             realProto = httpsrv_req.headers['x-forwarded-proto'];//客户请求的协议
         }
+        realProto = realProto.replace(/^\s+/g, '').replace(/\s+$/g, '').toLowerCase();
         const loguuid = httpsrv_req.headers['x-nws-log-uuid'];
         httpsrv_req.realURL = realProto + '://' + httpsrv_req.headers.host + httpsrv_req.url;
         //console.log(uuid + "\r\n" + httpsrv_req.realURL);
         //fun.log(`${realip}\t${proto}://${httpsrv_req.headers.host}${urlinfo.pathname}[${httpsrv_req.method}]`);
         const host = httpsrv_req.headers.host;
-        if (httpsrv_req.method === 'GET' && isFileDL(urlinfo)) {
+        if (realProto === 'http' && httpsrv_req.method === 'GET' && isFileDL(urlinfo)) {
             var newhost = host;
             newhost = newhost.replace(/\-/g, ',');
             newhost = newhost.replace(/\./g, '-');
