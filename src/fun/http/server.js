@@ -1,6 +1,27 @@
 const http = require('http');
 const url = require('url');
+const path = require('path');
+Array.prototype.contain = function(val) {
+    for (var i = 0; i < this.length; i++) {
+        if (this[i] === val) return true;
+    }
+    return false;
+};
+
 module.exports = (oFun, config) => {
+
+    const isFileDL = function (urlinfo) {
+        if (urlinfo.pathname === '/') {
+            return false;
+        }
+        const arr = ['', '.htm', '.html', '.php', '.asp', '.aspx'];
+        const extname = path.extname(urlinfo.pathname);
+        if (arr.contain(extname)) {
+            return false;
+        }
+        // console.log(extname);
+        return true;
+    };
     // Create an HTTP server
     const httpsrv = http.createServer((httpsrv_req, httpsrv_res) => {
         const urlinfo = url.parse(httpsrv_req.url); // 取得用户要访问的URL
@@ -23,21 +44,20 @@ module.exports = (oFun, config) => {
         //console.log(uuid + "\r\n" + httpsrv_req.realURL);
         //fun.log(`${realip}\t${proto}://${httpsrv_req.headers.host}${urlinfo.pathname}[${httpsrv_req.method}]`);
         const host = httpsrv_req.headers.host;
+        if (httpsrv_req.method === 'GET' && isFileDL(urlinfo)) {
+            var newhost = host;
+            newhost = newhost.replace(/\-/g, ',');
+            newhost = newhost.replace(/\./g, '-');
+            newhost = newhost.replace(/\,/g, '--');
+            var newurl = realProto + '://' + newhost + '.feieryun.net:8001' + httpsrv_req.url;
+            // console.log(newurl);
+            httpsrv_res.writeHead(302, {'Location': newurl});
+            httpsrv_res.end();
+            return;
+        }
         oFun.log.site(oFun, config, host, `${remoteSocket}\t${realIP}\t[${realProto}]${urlinfo.pathname}[${httpsrv_req.method}]`);
         const httpreq = oFun.http.request(oFun, config, httpsrv_res, httpsrv_req);
-        httpreq.on('error', (err) => {
-            console.error(`error on httpreq: ${err.message}`);
-        });
-        httpsrv_req.on('data', (chunk) => {
-            //console.log('httpsrv_req.on.data');
-            //收到用户POST过来数据，所以转发给Web服务器
-            httpreq.write(chunk);
-        });
-        httpsrv_req.on('end', () => {
-            //console.log('httpsrv_req.on.end');
-            //因为用户结束了请求，所以也就跟Web服务器断开连接
-            httpreq.end();
-        });
+        global.oClass.http.requestForward(httpsrv_req, httpreq);
     });
     httpsrv.on('connect', (req, cltSocket, head) => {
         // connect to an origin server

@@ -15,6 +15,12 @@ config.proxy_pass = 'http://10.86.3.51';//反向代理后端WEB
 config.gzip_options = {};
 config.gzip_options.level = zlib.Z_BEST_COMPRESSION;
 config.debug = 0;
+
+config.max_size_mb = 0.8;//限制文件大小(MB)
+config.max_size_byte = 1024 * 1024 * config.max_size_mb;
+config.limit_gzsize_mb = 0.3;//限制GZ压缩后的大小(MB)
+config.limit_gzsize_byte = 1024 * 1024 * config.limit_gzsize_mb;
+
 global.config = config;
 console.info(config);
 oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
@@ -26,10 +32,14 @@ oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
     var host = httpsrv_req.headers.host;
     host = host.split(':')[0];
     oStr.setSource(host);
-    oStr.setSuffix('.http81.firadio.net');
+    oStr.setSuffix('.feieryun.net');
     let httpreq;
     if (oStr.match_suffix()) {
-        httpsrv_req.headers.host = oStr.getPrefix();
+        var host = oStr.getPrefix();
+        host = host.replace(/\-\-/g, ',');
+        host = host.replace(/\-/g, '.');
+        host = host.replace(/\,/g, '-');
+        httpsrv_req.headers.host = host;
         httpreq = oClass.http.createRequest(config, httpsrv_req, (httpreq_res, oResHeader) => {
             httpsrv_res.writeHead(httpreq_res.statusCode, httpreq_res.statusMessage, oResHeader.getAll());
             httpreq_res.on('data', (chunk) => {
