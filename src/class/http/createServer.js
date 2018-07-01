@@ -17,13 +17,15 @@ module.exports = (config, _callBack) => {
         }
         var remoteAddress = '0.0.0.0';
         var remotePort = 0;
-        if (httpsrv_res.socket.remoteAddress) {
+        if (httpsrv_res.hasOwnProperty('socket') && httpsrv_res.socket.remoteAddress) {
             remoteAddress = httpsrv_res.socket.remoteAddress;
             remotePort = httpsrv_res.socket.remotePort;
         } else
-        if (httpsrv_req.connection.remoteAddress) {
+        if (httpsrv_req.hasOwnProperty('connection') && httpsrv_req.connection.remoteAddress) {
             remoteAddress = httpsrv_req.connection.remoteAddress;
             remotePort = httpsrv_req.connection.remotePort;
+        } else {
+            httpsrv_res.end('have no remoteAddress');
         }
         const remoteSocket = remoteAddress + ':' + remotePort;
         var realIP = remoteAddress;
