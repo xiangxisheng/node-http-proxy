@@ -1,11 +1,12 @@
 const http = require('http');
 const url = require('url');
+const fs = require('fs');
 //const zlib = require('zlib');
 module.exports = (oFun, config, httpsrv_res, httpsrv_req) => {
     const oProxyPass = url.parse(config.proxy_pass);
     const httpreq_options = {
         protocol: oProxyPass.protocol ? oProxyPass.protocol : 'http:',
-        host: oProxyPass.host,
+        host: oProxyPass.hostname,
         family: 4, //IP address family to use when resolving host
         port: oProxyPass.port ? oProxyPass.port : 80,
         method: httpsrv_req.method, //GET,POST,HEAD
@@ -36,6 +37,15 @@ module.exports = (oFun, config, httpsrv_res, httpsrv_req) => {
         oResHeader.realProto = httpsrv_req.realProto;
         oResHeader.urlinfo = httpsrv_req.urlinfo;
         //const httpreq_oInfo = oFun.http.getInfoByWebRes(httpsrv_req, httpreq_res, oResHeader);
+        if (httpreq_res.statusCode === 503) {
+            fs.readFile('./html/503.htm', function(err, data) {
+                // console.log(httpsrv_req.realURL);
+                oResHeader.set('Content-Length', data.length);
+                httpsrv_res.writeHead(200, oResHeader.getAll());
+                httpsrv_res.end(data);
+            });
+            return;
+        }
         var sGzipFlag = 'ignore';
         const is200 = (httpreq_res.statusCode === 200);
         const is2XX = (httpreq_res.statusCode >= 200 && httpreq_res.statusCode <= 299);

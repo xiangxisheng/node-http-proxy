@@ -134,7 +134,7 @@ module.exports = (_bHtml, oResHeader) => {
         oTitles[title] = 0;
         console.debug(outObj.charset, oResHeader.statusCode, title, oResHeader.realURL);
     }
-    if (1 || oResHeader.realProto === 'http') {
+    if (0 && oResHeader.realProto === 'http') {
         $("[src!='']").each(function(i, elem) {
             let src = $(this).attr('src');
             setSrcPath(oResHeader, src, 'src', $(this));

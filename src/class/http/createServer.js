@@ -17,11 +17,11 @@ module.exports = (config, _callBack) => {
         }
         var remoteAddress = '0.0.0.0';
         var remotePort = 0;
-        if (httpsrv_res.hasOwnProperty('socket') && httpsrv_res.socket.remoteAddress) {
+        if (httpsrv_res.hasOwnProperty('socket') && (typeof httpsrv_res.socket) === 'object' && httpsrv_res.socket.remoteAddress) {
             remoteAddress = httpsrv_res.socket.remoteAddress;
             remotePort = httpsrv_res.socket.remotePort;
         } else
-        if (httpsrv_req.hasOwnProperty('connection') && httpsrv_req.connection.remoteAddress) {
+        if (httpsrv_req.hasOwnProperty('connection') && (typeof httpsrv_req.connection) === 'object' && httpsrv_req.connection.remoteAddress) {
             remoteAddress = httpsrv_req.connection.remoteAddress;
             remotePort = httpsrv_req.connection.remotePort;
         } else {

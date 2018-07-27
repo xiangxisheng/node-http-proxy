@@ -1,6 +1,6 @@
 module.exports = function (httpsrv_req, httpreq) {
     httpreq.on('error', (err) => {
-        console.error(`error on httpreq: ${err.message}`);
+        console.error(`error on httpreq: ${err.message} at ${httpsrv_req.realURL}`);
     });
     httpsrv_req.on('data', (chunk) => {
         //console.log('httpsrv_req.on.data');

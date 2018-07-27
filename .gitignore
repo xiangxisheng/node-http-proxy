@@ -66,6 +66,14 @@ nbproject/
 *~
 *.exe
 
+*.zip
+*.rar
+*.gz
+*.bz2
+*.xz
+*.tar
+*.7z
+
 *.key
 *.cer
 

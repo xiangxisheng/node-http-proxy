@@ -1,7 +1,7 @@
 @ECHO OFF
 SET path=%path%;P:\data\code\PortableGit\bin\
-REM git config --global core.safecrlf false
-REM git config --global core.autocrlf input
+git config --global core.safecrlf false
+git config --global core.autocrlf input
 ECHO =========git diff============
 git diff
 ECHO =========git pull ^&^& git commit============
