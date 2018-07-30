@@ -2,6 +2,24 @@ const http = require('http');
 const https = require('https');
 const url = require('url');
 module.exports = (config, _callBack) => {
+    const getRemoteAddress = function (httpsrv_req, httpsrv_res) {
+        if (httpsrv_res.hasOwnProperty('socket') && (typeof httpsrv_res.socket) === 'object' && httpsrv_res.socket.remoteAddress) {
+            return httpsrv_res.socket.remoteAddress;
+        }
+        if (httpsrv_req.hasOwnProperty('connection') && (typeof httpsrv_req.connection) === 'object' && httpsrv_req.connection.remoteAddress) {
+            return httpsrv_req.connection.remoteAddress;
+        }
+        return '0.0.0.0';
+    };
+    const getRemotePort = function (httpsrv_req, httpsrv_res) {
+        if (httpsrv_res.hasOwnProperty('socket') && (typeof httpsrv_res.socket) === 'object' && httpsrv_res.socket.remotePort) {
+            return httpsrv_res.socket.remotePort;
+        }
+        if (httpsrv_req.hasOwnProperty('connection') && (typeof httpsrv_req.connection) === 'object' && httpsrv_req.connection.remotePort) {
+            return httpsrv_req.connection.remotePort;
+        }
+        return 0;
+    };
     // Create an HTTP server
     const callback = (httpsrv_req, httpsrv_res) => {
         const urlinfo = url.parse(httpsrv_req.url);
@@ -15,18 +33,8 @@ module.exports = (config, _callBack) => {
             httpsrv_res.end('have no connection in httpsrv_req');
             return;
         }
-        var remoteAddress = '0.0.0.0';
-        var remotePort = 0;
-        if (httpsrv_res.hasOwnProperty('socket') && (typeof httpsrv_res.socket) === 'object' && httpsrv_res.socket.remoteAddress) {
-            remoteAddress = httpsrv_res.socket.remoteAddress;
-            remotePort = httpsrv_res.socket.remotePort;
-        } else
-        if (httpsrv_req.hasOwnProperty('connection') && (typeof httpsrv_req.connection) === 'object' && httpsrv_req.connection.remoteAddress) {
-            remoteAddress = httpsrv_req.connection.remoteAddress;
-            remotePort = httpsrv_req.connection.remotePort;
-        } else {
-            httpsrv_res.end('have no remoteAddress');
-        }
+        const remoteAddress = getRemoteAddress(httpsrv_req, httpsrv_res);
+        const remotePort = getRemotePort(httpsrv_req, httpsrv_res);
         const remoteSocket = remoteAddress + ':' + remotePort;
         var realIP = remoteAddress;
         if (httpsrv_req.headers.hasOwnProperty('x-forwarded-for')) {

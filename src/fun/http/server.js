@@ -10,11 +10,30 @@ Array.prototype.contain = function(val) {
 
 module.exports = (oFun, config) => {
 
+    const getRemoteAddress = function (httpsrv_req, httpsrv_res) {
+        if (httpsrv_res.hasOwnProperty('socket') && (typeof httpsrv_res.socket) === 'object' && httpsrv_res.socket.remoteAddress) {
+            return httpsrv_res.socket.remoteAddress;
+        }
+        if (httpsrv_req.hasOwnProperty('connection') && (typeof httpsrv_req.connection) === 'object' && httpsrv_req.connection.remoteAddress) {
+            return httpsrv_req.connection.remoteAddress;
+        }
+        return '0.0.0.0';
+    };
+    const getRemotePort = function (httpsrv_req, httpsrv_res) {
+        if (httpsrv_res.hasOwnProperty('socket') && (typeof httpsrv_res.socket) === 'object' && httpsrv_res.socket.remotePort) {
+            return httpsrv_res.socket.remotePort;
+        }
+        if (httpsrv_req.hasOwnProperty('connection') && (typeof httpsrv_req.connection) === 'object' && httpsrv_req.connection.remotePort) {
+            return httpsrv_req.connection.remotePort;
+        }
+        return 0;
+    };
     const isFileDL = function (urlinfo) {
         if (urlinfo.pathname === '/') {
             return false;
         }
         const arr = ['', '.htm', '.html', '.php', '.asp', '.aspx'];
+        arr.push('.css', '.ttf', '.woff', '.woff2');
         const extname = path.extname(urlinfo.pathname);
         if (arr.contain(extname)) {
             return false;
@@ -43,8 +62,8 @@ module.exports = (oFun, config) => {
     const httpsrv = http.createServer((httpsrv_req, httpsrv_res) => {
         const urlinfo = url.parse(httpsrv_req.url); // 取得用户要访问的URL
         urlinfo.dirname = getDirname(urlinfo.pathname);
-        const remoteAddress = httpsrv_res.socket.remoteAddress;
-        const remotePort = httpsrv_res.socket.remotePort;
+        const remoteAddress = getRemoteAddress(httpsrv_req, httpsrv_res);
+        const remotePort = getRemotePort(httpsrv_req, httpsrv_res);
         const remoteSocket = remoteAddress + ':' + remotePort;
         var realIP = remoteAddress; // 腾讯云CDN请求过来的IP
         if (httpsrv_req.headers.hasOwnProperty('x-forwarded-for')) {
