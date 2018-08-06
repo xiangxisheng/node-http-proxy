@@ -137,11 +137,13 @@ module.exports = (oFun, config) => {
         httpsrv_req.headers.host = httpsrv_req.headers.host.replace(/^\.+|\.+$/gm, '');
         const host = httpsrv_req.headers.host;
         if (global.config.listen_port == 84) {
-            if (!isFileDL(urlinfo) && !isBeian(host) && !isCloudflare(httpsrv_req.headers)) {
+            const skipBeian = (isFileDL(urlinfo) && isCloudflare(httpsrv_req.headers));
+            if (!isBeian(host) && !skipBeian) {
                 const fastHost = getNewHost(host);
                 fs.readFile('./html/non-beian.htm', 'utf8', function(err, data) {
                     data = data.replace(/\$\{host\}/g, host);
                     data = data.replace(/\$\{fastHost\}/g, fastHost);
+                    data = data.replace(/\$\{pathUrl\}/g, httpsrv_req.url);
                     const buf = new Buffer(data);
                     const oResHeader = global.oClass.http.header();
                     oResHeader.set('Content-Type', 'text/html; charset=utf-8');
