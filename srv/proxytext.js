@@ -18,6 +18,18 @@ config.limit_gzsize_byte = 1024 * 1024 * config.limit_gzsize_mb;
 config.gzip_options = {};
 config.gzip_options.level = zlib.Z_BEST_COMPRESSION;
 config.debug = 0;
+config.beianList = (function () {
+    const beianList = [];
+    beianList.push('28820.com');
+    beianList.push('anan.cc');
+    beianList.push('feieryun.cn');
+    beianList.push('feieryun.com');
+    beianList.push('feieryun.net');
+    beianList.push('firadio.cn');
+    beianList.push('firadio.com');
+    beianList.push('firadio.net');
+    return beianList;
+})();
 global.config = config;
 console.info(config);
 oFun.http.server(oFun, config);

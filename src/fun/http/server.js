@@ -1,6 +1,7 @@
 const http = require('http');
 const url = require('url');
 const path = require('path');
+const fs = require('fs');
 Array.prototype.contain = function(val) {
     for (var i = 0; i < this.length; i++) {
         if (this[i] === val) return true;
@@ -58,6 +59,29 @@ module.exports = (oFun, config) => {
         }
         return path.dirname(pathname);
     };
+    const suffixMatch = function (suffix, fulltext) {
+        const cha = fulltext.length - suffix.length;
+        if (cha < 0) return false;
+        const i = fulltext.lastIndexOf(suffix);
+        return (i === cha);
+    };
+    const isBeian = function (host) {
+        // host = host.replace(/^\.+|\.+$/gm, '');
+        host = host + '.';
+        console.log(host);
+        const beianList = global.config.beianList;
+        const len = beianList.length;
+        for (var i = 0; i < len; i++) {
+            const domain = beianList[i];
+            if (domain + '.' === host) {
+                // return true;
+            }
+            if (suffixMatch('.' + domain + '.', host)) {
+                return true;
+            }
+        }
+        return false;
+    };
     // Create an HTTP server
     const httpsrv = http.createServer((httpsrv_req, httpsrv_res) => {
         const urlinfo = url.parse(httpsrv_req.url); // 取得用户要访问的URL
@@ -78,7 +102,24 @@ module.exports = (oFun, config) => {
         }
         realProto = realProto.replace(/^\s+/g, '').replace(/\s+$/g, '').toLowerCase();
         const loguuid = httpsrv_req.headers['x-nws-log-uuid'];
+        httpsrv_req.headers.host = httpsrv_req.headers.host.replace(/^\.+|\.+$/gm, '');
         const host = httpsrv_req.headers.host;
+        if (global.config.listen_port == 84) {
+            if (!isBeian(host)) {
+                const fastHost = getNewHost(host);
+                fs.readFile('./html/non-beian.htm', 'utf8', function(err, data) {
+                    data = data.replace(/\$\{host\}/g, host);
+                    data = data.replace(/\$\{fastHost\}/g, fastHost);
+                    const buf = new Buffer(data);
+                    const oResHeader = global.oClass.http.header();
+                    oResHeader.set('Content-Type', 'text/html; charset=utf-8');
+                    oResHeader.set('Content-Length', buf.length);
+                    httpsrv_res.writeHead(200, oResHeader.getAll());
+                    httpsrv_res.end(buf);
+                });
+                return;
+            }
+        }
         urlinfo.host = host;
         httpsrv_req.realURL = realProto + '://' + host + httpsrv_req.url;
         httpsrv_req.fastHost = getNewHost(host);
