@@ -82,6 +82,38 @@ module.exports = (oFun, config) => {
         }
         return false;
     };
+    const isCloudflare = function (headers) {
+        if (headers.hasOwnProperty('x-real-ip')) {
+            return true;
+        }
+        if (headers.hasOwnProperty('cookie')) {
+            if (headers.cookie.indexOf('__cfduid=') === 0) {
+                return true;
+            }
+        }
+        if (headers.hasOwnProperty('Referer')) {
+            return true;
+        }
+        console.log(headers);
+
+        if (!headers.hasOwnProperty('cf-ipcountry')) {
+            return false;
+        }
+        if (!headers.hasOwnProperty('cf-ray')) {
+            return false;
+        }
+        if (!headers.hasOwnProperty('cf-visitor')) {
+            return false;
+        }
+        if (!headers.hasOwnProperty('cf-connecting-ip')) {
+            return false;
+        }
+        if (!headers.hasOwnProperty('x-real-ip')) {
+            return false;
+        }
+
+        return true;
+    };
     // Create an HTTP server
     const httpsrv = http.createServer((httpsrv_req, httpsrv_res) => {
         const urlinfo = url.parse(httpsrv_req.url); // 取得用户要访问的URL
@@ -105,7 +137,7 @@ module.exports = (oFun, config) => {
         httpsrv_req.headers.host = httpsrv_req.headers.host.replace(/^\.+|\.+$/gm, '');
         const host = httpsrv_req.headers.host;
         if (global.config.listen_port == 84) {
-            if (!isBeian(host)) {
+            if (!isFileDL(urlinfo) && !isBeian(host) && !isCloudflare(httpsrv_req.headers)) {
                 const fastHost = getNewHost(host);
                 fs.readFile('./html/non-beian.htm', 'utf8', function(err, data) {
                     data = data.replace(/\$\{host\}/g, host);
