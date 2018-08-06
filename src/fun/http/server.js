@@ -148,7 +148,7 @@ module.exports = (oFun, config) => {
                     const oResHeader = global.oClass.http.header();
                     oResHeader.set('Content-Type', 'text/html; charset=utf-8');
                     oResHeader.set('Content-Length', buf.length);
-                    httpsrv_res.writeHead(200, oResHeader.getAll());
+                    httpsrv_res.writeHead(400, oResHeader.getAll());
                     httpsrv_res.end(buf);
                 });
                 return;
