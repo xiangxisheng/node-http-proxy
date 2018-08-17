@@ -74,7 +74,7 @@ module.exports = (oFun, config) => {
         for (var i = 0; i < len; i++) {
             const domain = beianList[i];
             if (domain + '.' === host) {
-                // return true;
+                return true;
             }
             if (suffixMatch('.' + domain + '.', host)) {
                 return true;
@@ -134,6 +134,9 @@ module.exports = (oFun, config) => {
         }
         realProto = realProto.replace(/^\s+/g, '').replace(/\s+$/g, '').toLowerCase();
         const loguuid = httpsrv_req.headers['x-nws-log-uuid'];
+        if (!httpsrv_req.headers.hasOwnProperty('host')) {
+            httpsrv_req.headers.host = '';
+        }
         httpsrv_req.headers.host = httpsrv_req.headers.host.replace(/^\.+|\.+$/gm, '');
         const host = httpsrv_req.headers.host;
         if (global.config.listen_port == 84) {
@@ -161,7 +164,11 @@ module.exports = (oFun, config) => {
         httpsrv_req.urlinfo = urlinfo;
         //console.log(uuid + "\r\n" + httpsrv_req.realURL);
         //fun.log(`${realip}\t${proto}://${httpsrv_req.headers.host}${urlinfo.pathname}[${httpsrv_req.method}]`);
-        if (httpsrv_req.method === 'GET' && isFileDL(urlinfo)) {
+        if (1
+            && httpsrv_req.method === 'GET'
+            && isFileDL(urlinfo)
+            && global.config.listen_port != 84
+        ) {
             const port = (realProto === 'http') ? 8001 : 4431;
             var newurl = realProto + '://' + httpsrv_req.fastHost + ':' + port + httpsrv_req.url;
             // console.log(newurl);

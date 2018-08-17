@@ -20,6 +20,7 @@ config.gzip_options.level = zlib.Z_BEST_COMPRESSION;
 config.debug = 0;
 config.beianList = (function () {
     const beianList = [];
+    beianList.push('2398dj.com');
     beianList.push('28820.com');
     beianList.push('anan.cc');
     beianList.push('feieryun.cn');
