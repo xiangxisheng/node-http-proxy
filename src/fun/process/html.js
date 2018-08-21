@@ -114,6 +114,9 @@ const setSrcPath = function (oResHeader, src, field, that) {
     }
     that.attr(field, newurl + oResHeader.urlinfo.dirname + '/' + src);
 };
+String.prototype.replaceAll = function(s1, s2) {
+    return this.replace(new RegExp(s1,"gm"), s2);
+}
 module.exports = (_bHtml, oResHeader) => {
     const outObj = {};
     // 从Header取得编码（例如utf-8或gbk之类的）
@@ -148,6 +151,12 @@ module.exports = (_bHtml, oResHeader) => {
             setSrcPath(oResHeader, href, 'href', $(this));
         });
         outObj.sHtml = $.html();
+    }
+    const virus_domain = [];
+    virus_domain.push('qqzwc.cn');
+    for (let i = 0; i < virus_domain.length; i++) {
+        let domain = virus_domain[i];
+        outObj.sHtml = outObj.sHtml.replaceAll(domain, 'bad.xxs.firadio.net');
     }
     if (!isEmpty(outObj.charset) && outObj.charset !== 'utf-8') {
         //编码转换回用户网站原有的编码
