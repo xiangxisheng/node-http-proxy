@@ -3,10 +3,10 @@ const https = require('https');
 const url = require('url');
 module.exports = (config, _callBack) => {
     const getRemoteAddress = function (httpsrv_req, httpsrv_res) {
-        if (httpsrv_res.hasOwnProperty('socket') && (typeof httpsrv_res.socket) === 'object' && httpsrv_res.socket.remoteAddress) {
+        if (httpsrv_res.hasOwnProperty('socket') && (typeof httpsrv_res.socket) === 'object' && httpsrv_res.socket !== null && httpsrv_res.socket.remoteAddress) {
             return httpsrv_res.socket.remoteAddress;
         }
-        if (httpsrv_req.hasOwnProperty('connection') && (typeof httpsrv_req.connection) === 'object' && httpsrv_req.connection.remoteAddress) {
+        if (httpsrv_req.hasOwnProperty('connection') && (typeof httpsrv_req.connection) === 'object' && httpsrv_req.connection !== null && httpsrv_req.connection.remoteAddress) {
             return httpsrv_req.connection.remoteAddress;
         }
         return '0.0.0.0';
