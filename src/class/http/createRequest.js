@@ -5,7 +5,7 @@ module.exports = (config, httpsrv_req, _callBack) => {
     const oProxyPass = url.parse(config.proxy_pass);
     const httpreq_options = {
         protocol: oProxyPass.protocol ? oProxyPass.protocol : 'http:',
-        host: oProxyPass.host,
+        host: oProxyPass.hostname,
         family: 4, //IP address family to use when resolving host
         port: oProxyPass.port ? oProxyPass.port : 80,
         method: httpsrv_req.method, //GET,POST,HEAD
@@ -20,6 +20,7 @@ module.exports = (config, httpsrv_req, _callBack) => {
         oResHeader.del('X-Powered-By');
         oResHeader.statusCode = httpreq_res.statusCode;//WEB返回的状态号码
         oResHeader.statusMessage = httpreq_res.statusMessage;//WEB返回的状态消息
+        oResHeader.method = httpsrv_req.method;
         oResHeader.realURL = httpsrv_req.realURL;//用户请求的URL
         _callBack(httpreq_res, oResHeader);
     });

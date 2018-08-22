@@ -160,7 +160,7 @@ module.exports = (_bHtml, oResHeader) => {
     }
     if (!isEmpty(outObj.charset) && outObj.charset !== 'utf-8') {
         //编码转换回用户网站原有的编码
-        return iconv.encode(outObj.sHtml, outObj.charset);
+        outObj.sHtml = iconv.encode(outObj.sHtml, outObj.charset);
     }
     return outObj.sHtml;
 };

@@ -1,4 +1,7 @@
 const zlib = require('zlib');
+if (!global.hasOwnProperty('cache_url')) {
+    global.cache_url = {};
+}
 module.exports = (oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader) => {
     //var chunk_totalsize = 0;
     const aDataChunk = [];
@@ -10,10 +13,12 @@ module.exports = (oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader)
          return;
          }//*/
         //收到WEB的数据,下面转发给用户
+        aDataChunk.push(chunk);
         if (sGzipFlag === 'ignore') {
+            // 直接传送非 2XX 状态的请求
+            // 直接传送非 gzip 格式的压缩数据
+            // 直接传送非 text/html 的 contentType
             httpsrv_res.write(chunk);
-        } else {
-            aDataChunk.push(chunk);
         }
     });
     httpreq_res.on('end', () => {
@@ -41,6 +46,12 @@ module.exports = (oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader)
         } else {
             //sGzipFlag === 'ignore'
             httpsrv_res.end();
+            if (oResHeader.method === 'GET' && oResHeader.statusCode == 200) {
+                var obj = {};
+                obj.oResHeader = oResHeader;
+                obj.data = Buffer.concat(aDataChunk);
+                global.cache_url[oResHeader.realURL] = obj;
+            }
         }
     });
 };

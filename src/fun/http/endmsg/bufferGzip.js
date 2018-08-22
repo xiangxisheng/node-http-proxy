@@ -1,4 +1,7 @@
 const zlib = require('zlib');
+if (!global.hasOwnProperty('cache_url')) {
+    global.cache_url = {};
+}
 module.exports = (oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader) => {
     zlib.gzip(buffer, function (err, encoded) {
         if (err) {
@@ -16,5 +19,11 @@ module.exports = (oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader) =>
             console.error(err, httpreq_res.statusCode, httpreq_res.statusMessage, oResHeader.getAll());
         }
         httpsrv_res.end(encoded);
+        if (oResHeader.method === 'GET') {
+            const obj = {};
+            obj.oResHeader = oResHeader;
+            obj.data = encoded;
+            global.cache_url[oResHeader.realURL] = obj;
+        }
     });
 };
