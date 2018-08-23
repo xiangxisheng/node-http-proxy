@@ -1,6 +1,8 @@
 const http = require('http');
 const https = require('https');
 const url = require('url');
+const path = require('path');
+
 module.exports = (config, _callBack) => {
     const getRemoteAddress = function (httpsrv_req, httpsrv_res) {
         if (httpsrv_res.hasOwnProperty('socket') && (typeof httpsrv_res.socket) === 'object' && httpsrv_res.socket !== null && httpsrv_res.socket.remoteAddress) {
@@ -12,17 +14,35 @@ module.exports = (config, _callBack) => {
         return '0.0.0.0';
     };
     const getRemotePort = function (httpsrv_req, httpsrv_res) {
-        if (httpsrv_res.hasOwnProperty('socket') && (typeof httpsrv_res.socket) === 'object' && httpsrv_res.socket.remotePort) {
+        if (httpsrv_res.hasOwnProperty('socket') && (typeof httpsrv_res.socket) === 'object' && httpsrv_res.socket !== null && httpsrv_res.socket.remotePort) {
             return httpsrv_res.socket.remotePort;
         }
-        if (httpsrv_req.hasOwnProperty('connection') && (typeof httpsrv_req.connection) === 'object' && httpsrv_req.connection.remotePort) {
+        if (httpsrv_req.hasOwnProperty('connection') && (typeof httpsrv_req.connection) === 'object' && httpsrv_req.connection !== null && httpsrv_req.connection.remotePort) {
             return httpsrv_req.connection.remotePort;
         }
         return 0;
     };
+    const getDirname = function (pathname) {
+        pathname = pathname.replace(/\/$/, '');
+        if (path.extname(pathname) === '') {
+            return pathname;
+        }
+        return path.dirname(pathname);
+    };
     // Create an HTTP server
     const callback = (httpsrv_req, httpsrv_res) => {
+        if (!httpsrv_req.headers.hasOwnProperty('host')) {
+            console.info('have no host in httpsrv_req.headers');
+            httpsrv_res.end();
+            return;
+        }
+        // 去掉前后多余的小数点
+        httpsrv_req.headers.host = httpsrv_req.headers.host.replace(/^\.+|\.+$/gm, '');
+        const host = httpsrv_req.headers.host;
+        // 取得用户要访问的URL的请求信息
         const urlinfo = url.parse(httpsrv_req.url);
+        urlinfo.dirname = getDirname(urlinfo.pathname);
+        urlinfo.host = host;
         if (0 && !httpsrv_res.hasOwnProperty('socket')) {
             console.info('have no socket in httpsrv_res');
             httpsrv_res.end('have no socket in httpsrv_res');
@@ -36,10 +56,14 @@ module.exports = (config, _callBack) => {
         const remoteAddress = getRemoteAddress(httpsrv_req, httpsrv_res);
         const remotePort = getRemotePort(httpsrv_req, httpsrv_res);
         const remoteSocket = remoteAddress + ':' + remotePort;
-        var realIP = remoteAddress;
+        var realIP = remoteAddress; // 腾讯云CDN请求过来的IP
         if (httpsrv_req.headers.hasOwnProperty('x-forwarded-for')) {
-            realIP = httpsrv_req.headers['x-forwarded-for'];//获取真实IP
+            // 从腾讯云CDN获得用户的真实IP
+            realIP = httpsrv_req.headers['x-forwarded-for'];
         }
+        // 告知后端WEB服务器：腾讯云CDN请求过来的IP
+        httpsrv_req.headers['remoteSocket'] = remoteSocket;
+        // 告知后端WEB服务器：用户的真实IP（由腾讯云获取）
         httpsrv_req.headers['x-real-ip'] = realIP;
         let realProto = 'http';
         if (httpsrv_req.headers.hasOwnProperty('x-forwarded-proto')) {
@@ -47,8 +71,9 @@ module.exports = (config, _callBack) => {
         }
         realProto = realProto.replace(/^\s+/g, '').replace(/\s+$/g, '').toLowerCase();
         const loguuid = httpsrv_req.headers['x-nws-log-uuid'];
-        const host = httpsrv_req.headers.host;
         httpsrv_req.realURL = realProto + '://' + host + httpsrv_req.url;
+        httpsrv_req.realProto = realProto;
+        httpsrv_req.urlinfo = urlinfo;
         // global.oFun.log.site(global.oFun, config, host, `${remoteSocket}\t${realIP}\t[${realProto}]${urlinfo.pathname}[${httpsrv_req.method}]`);
         _callBack(httpsrv_req, httpsrv_res);
     };
