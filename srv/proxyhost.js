@@ -15,7 +15,7 @@ config.listen_addr = process.argv[3] ? process.argv[3] : '0.0.0.0';
 config.gzip_options = {};
 config.gzip_options.level = zlib.Z_BEST_COMPRESSION;
 config.debug = 0;
-
+config.disableEncoding = true;
 global.config = config;
 console.info(config);
 
@@ -40,26 +40,26 @@ var display_url = function (httpsrv_req) {
 
     writeList.push('mobilecdn.kugou.com');
     writeList.push('addon.discuz.com');
+
+    writeList.push('zhannei.baidu.com');
+
     // writeList.push('api.spp3.cn');
     // writeList.push('sq.xsfuh.pw');
 
     if (writeList.indexOf(httpsrv_req.headers.host) >= 0) {
         return;
     }
-    console.log(`[${httpsrv_req.method}] ${httpsrv_req.realURL}`);
+    console.log(`[${httpsrv_req.method}] ${httpsrv_req.headers.host}`);
+    // console.log(`[${httpsrv_req.method}] ${httpsrv_req.realURL}`);
 };
 oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
-    if (!httpsrv_req.headers.hasOwnProperty('host')) {
-        console.info('have no host in httpsrv_req.headers');
-        httpsrv_res.end();
-        return;
-    }
     var host = httpsrv_req.headers.host;
     httpsrv_req.realURL = 'http://' + host + httpsrv_req.url;
     if (httpsrv_req.method === 'GET' && global.cache_url.hasOwnProperty(httpsrv_req.realURL)) {
         const obj = global.cache_url[httpsrv_req.realURL];
         httpsrv_res.writeHead(200, obj.oResHeader.getAll());
         httpsrv_res.end(obj.data);
+        // console.log(`cached ${httpsrv_req.realURL}`);
         return;
     }
     display_url(httpsrv_req);

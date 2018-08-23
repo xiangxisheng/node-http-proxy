@@ -3,6 +3,20 @@ if (!global.hasOwnProperty('cache_url')) {
     global.cache_url = {};
 }
 module.exports = (oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader) => {
+    if (config.disableEncoding) {
+        // 跳过编码压缩的
+        oResHeader.set('content-length', buffer.length);
+        oResHeader.del('content-encoding');
+        httpsrv_res.end(buffer);
+        if (oResHeader.method === 'GET') {
+            const obj = {};
+            obj.oResHeader = oResHeader;
+            obj.data = buffer;
+            global.cache_url[oResHeader.realURL] = obj;
+        }
+        return;
+    }
+    // 需要编码压缩的
     zlib.gzip(buffer, function (err, encoded) {
         if (err) {
             console.error(`error on zlib.gzip2: ${err.message}`);
