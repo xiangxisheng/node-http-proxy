@@ -29,13 +29,8 @@ global.config = config;
 console.info(config);
 oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
     const oStr = oClass.common.string();
-    if (!httpsrv_req.headers.hasOwnProperty('host')) {
-        console.info('have no host in httpsrv_req.headers');
-        return;
-    }
-    var host = httpsrv_req.headers.host;
-    host = host.split(':')[0];
-    oStr.setSource(host);
+    var hostname = httpsrv_req.headers.hostname;
+    oStr.setSource(hostname);
     oStr.setSuffix('.feieryun.net');
     let httpreq;
     if (oStr.match_suffix()) {
@@ -43,7 +38,7 @@ oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
         host = host.replace(/\-\-/g, ',');
         host = host.replace(/\-/g, '.');
         host = host.replace(/\,/g, '-');
-        httpsrv_req.headers.host = host;
+        httpsrv_req.headers.hostname = host;
         httpreq = oClass.http.createRequest(config, httpsrv_req, (httpreq_res, oResHeader) => {
             httpsrv_res.writeHead(httpreq_res.statusCode, httpreq_res.statusMessage, oResHeader.getAll());
             httpreq_res.on('data', (chunk) => {
