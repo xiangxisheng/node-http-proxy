@@ -4,7 +4,7 @@ const fs = require('fs');
 //const zlib = require('zlib');
 module.exports = (oFun, config, httpsrv_res, httpsrv_req) => {
     const oProxyPass = url.parse(config.proxy_pass);
-    // httpsrv_req.headers.host = httpsrv_req.headers.host.replace(/^\.+|\.+$/gm, '');
+    httpsrv_req.headers.host = httpsrv_req.headers.hostname;
     const httpreq_options = {
         protocol: oProxyPass.protocol ? oProxyPass.protocol : 'http:',
         host: oProxyPass.hostname,

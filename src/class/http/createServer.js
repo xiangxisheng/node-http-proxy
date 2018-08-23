@@ -29,6 +29,13 @@ module.exports = (config, _callBack) => {
         }
         return path.dirname(pathname);
     };
+    const removePortByHost = function (host) {
+        const colon_pos = host.lastIndexOf(':');
+        if (colon_pos >= 0) {
+            host = host.substr(0, colon_pos);
+        }
+        return host;
+    };
     // Create an HTTP server
     const callback = (httpsrv_req, httpsrv_res) => {
         if (!httpsrv_req.headers.hasOwnProperty('host')) {
@@ -36,23 +43,15 @@ module.exports = (config, _callBack) => {
             httpsrv_res.end();
             return;
         }
-        // 去掉前后多余的小数点
-        httpsrv_req.headers.host = httpsrv_req.headers.host.replace(/^\.+|\.+$/gm, '');
-        const host = httpsrv_req.headers.host;
+        // 先把host的端口去掉,变为hostname
+        httpsrv_req.headers.hostname = removePortByHost(httpsrv_req.headers.host);
+        // 然后对hostname去掉前后多余的小数点
+        httpsrv_req.headers.hostname = httpsrv_req.headers.hostname.replace(/^\.+|\.+$/gm, '');
         // 取得用户要访问的URL的请求信息
         const urlinfo = url.parse(httpsrv_req.url);
         urlinfo.dirname = getDirname(urlinfo.pathname);
-        urlinfo.host = host;
-        if (0 && !httpsrv_res.hasOwnProperty('socket')) {
-            console.info('have no socket in httpsrv_res');
-            httpsrv_res.end('have no socket in httpsrv_res');
-            return;
-        }
-        if (0 && !httpsrv_req.hasOwnProperty('connection')) {
-            console.info('have no connection in httpsrv_req');
-            httpsrv_res.end('have no connection in httpsrv_req');
-            return;
-        }
+        urlinfo.host = httpsrv_req.headers.host;
+        urlinfo.hostname = httpsrv_req.headers.hostname;
         const remoteAddress = getRemoteAddress(httpsrv_req, httpsrv_res);
         const remotePort = getRemotePort(httpsrv_req, httpsrv_res);
         const remoteSocket = remoteAddress + ':' + remotePort;
@@ -71,10 +70,10 @@ module.exports = (config, _callBack) => {
         }
         realProto = realProto.replace(/^\s+/g, '').replace(/\s+$/g, '').toLowerCase();
         const loguuid = httpsrv_req.headers['x-nws-log-uuid'];
-        httpsrv_req.realURL = realProto + '://' + host + httpsrv_req.url;
+        httpsrv_req.realURL = realProto + '://' + httpsrv_req.headers.host + httpsrv_req.url;
         httpsrv_req.realProto = realProto;
         httpsrv_req.urlinfo = urlinfo;
-        // global.oFun.log.site(global.oFun, config, host, `${remoteSocket}\t${realIP}\t[${realProto}]${urlinfo.pathname}[${httpsrv_req.method}]`);
+        // global.oFun.log.site(global.oFun, config, httpsrv_req.headers.host, `${remoteSocket}\t${realIP}\t[${realProto}]${urlinfo.pathname}[${httpsrv_req.method}]`);
         _callBack(httpsrv_req, httpsrv_res);
     };
     let httpsrv = (config.listen_port.toString().indexOf('443') === 0) ? https.createServer(config, callback) : http.createServer(callback);

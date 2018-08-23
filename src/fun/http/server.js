@@ -24,6 +24,7 @@ module.exports = (oFun, config) => {
         // console.log(extname);
         return true;
     };
+
     const getNewHost = function (host) {
         if (host === undefined) {
             return '';
@@ -42,7 +43,6 @@ module.exports = (oFun, config) => {
         return (i === cha);
     };
     const isBeian = function (host) {
-        // host = host.replace(/^\.+|\.+$/gm, '');
         host = host + '.';
         console.log(host);
         const beianList = global.config.beianList;
@@ -94,13 +94,20 @@ module.exports = (oFun, config) => {
     oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
         const remoteSocket = httpsrv_req.headers['remoteSocket'];
         const realIP = httpsrv_req.headers['x-real-ip'];
-        const host = httpsrv_req.headers.host;
-        httpsrv_req.fastHost = getNewHost(host);
+        const hostname = httpsrv_req.headers.hostname;
+        oFun.log.site(oFun, config, hostname, `${remoteSocket}\t${realIP}\t[${httpsrv_req.realProto}]${httpsrv_req.urlinfo.pathname}[${httpsrv_req.method}]`);
+        if (httpsrv_req.method === 'GET' && global.cache_url.hasOwnProperty(httpsrv_req.realURL)) {
+            const obj = global.cache_url[httpsrv_req.realURL];
+            httpsrv_res.writeHead(200, obj.oResHeader.getAll());
+            httpsrv_res.end(obj.data);
+            return;
+        }
+        httpsrv_req.fastHost = getNewHost(hostname);
         if (global.config.listen_port == 84) {
             const skipBeian = (isFileDL(httpsrv_req.urlinfo) && isCloudflare(httpsrv_req.headers));
-            if (!isBeian(host) && !skipBeian) {
+            if (!isBeian(hostname) && !skipBeian) {
                 fs.readFile('./html/non-beian.htm', 'utf8', function(err, data) {
-                    data = data.replace(/\$\{host\}/g, host);
+                    data = data.replace(/\$\{hostname\}/g, hostname);
                     data = data.replace(/\$\{fastHost\}/g, httpsrv_req.fastHost);
                     data = data.replace(/\$\{pathUrl\}/g, httpsrv_req.url);
                     const buf = new Buffer(data);
@@ -127,7 +134,6 @@ module.exports = (oFun, config) => {
             httpsrv_res.end();
             return;
         }
-        oFun.log.site(oFun, config, host, `${remoteSocket}\t${realIP}\t[${httpsrv_req.realProto}]${httpsrv_req.urlinfo.pathname}[${httpsrv_req.method}]`);
         const httpreq = oFun.http.request(oFun, config, httpsrv_res, httpsrv_req);
         global.oClass.http.requestForward(httpsrv_req, httpreq);
     });
