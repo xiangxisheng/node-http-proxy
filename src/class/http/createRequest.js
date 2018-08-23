@@ -1,8 +1,10 @@
 const http = require('http');
 const url = require('url');
 //const zlib = require('zlib');
+
 module.exports = (config, httpsrv_req, _callBack) => {
     const oProxyPass = url.parse(config.proxy_pass);
+    httpsrv_req.headers.host = httpsrv_req.headers.hostname;
     const httpreq_options = {
         protocol: oProxyPass.protocol ? oProxyPass.protocol : 'http:',
         host: oProxyPass.hostname,

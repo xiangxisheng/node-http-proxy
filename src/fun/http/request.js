@@ -14,26 +14,18 @@ module.exports = (oFun, config, httpsrv_res, httpsrv_req) => {
         path: httpsrv_req.url,
         headers: httpsrv_req.headers//来自用户请求的头
     };
-    // 向后端WEB服务器发送HTTP请求
-    const httpreq = http.request(httpreq_options, (httpreq_res) => {
+    const callBack = (httpreq_res, oResHeader) => {
         //给用户发送WEB返回的头
         //httpreq_ctype = httpreq_ctype.trim();
         if (oFun.http.limit.filesize(oFun, config, httpsrv_res, httpsrv_req, httpreq_res)) {
             return;//达到限制条件,下面就不执行了
         }
         // 取得后端WEB服务器返回的headers
-        const oResHeader = global.oClass.http.header(httpreq_res.headers);
-        oResHeader.set('Connection', 'keep-alive');//保持长连接
-        oResHeader.del('Server');
-        oResHeader.del('X-Powered-By');
         if (1) {
             oResHeader.del('Content-Security-Policy');
             oResHeader.del('X-Content-Security-Policy');
             oResHeader.del('X-Webkit-Csp');
         }
-        oResHeader.statusCode = httpreq_res.statusCode;//WEB返回的状态号码
-        oResHeader.statusMessage = httpreq_res.statusMessage;//WEB返回的状态消息
-        oResHeader.realURL = httpsrv_req.realURL;//用户请求的URL
         oResHeader.fastHost = httpsrv_req.fastHost;
         oResHeader.realProto = httpsrv_req.realProto;
         oResHeader.urlinfo = httpsrv_req.urlinfo;
@@ -88,6 +80,7 @@ module.exports = (oFun, config, httpsrv_res, httpsrv_req) => {
             oResHeader.set('Content-Length-Before', oResHeader.get('content-length'));
         }
         oFun.http.responseData(oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader);
-    });
-    return httpreq;
+    };
+    // 向后端WEB服务器发送HTTP请求
+    return oClass.http.createRequest(config, httpsrv_req, callBack);
 };
