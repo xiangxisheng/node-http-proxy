@@ -114,6 +114,29 @@ const setSrcPath = function (oResHeader, src, field, that) {
     }
     that.attr(field, newurl + oResHeader.urlinfo.dirname + '/' + src);
 };
+const str_replace_one = function(fulltext, subtext, newtext) {
+    const i1 = fulltext.indexOf(subtext);
+    if (i1 === -1) {
+        return fulltext;
+    }
+    return fulltext.substr(0, i1) + newtext + fulltext.substr(i1 + subtext.length);
+}
+const str_replace = function(subtext, newtext, fulltext) {
+    // 模仿PHP写的文本替换功能
+    let i1 = 0;
+    let i2 = 0;
+    let arr = [];
+    while (true) {
+        i1 = fulltext.indexOf(subtext, i2);
+        if (i1 === -1) {
+            arr.push(fulltext.substr(i2));
+            break;
+        }
+        arr.push(fulltext.substring(i2, i1));
+        i2 = i1 + subtext.length;
+    }
+    return arr.join(newtext);
+}
 String.prototype.replaceAll = function(s1, s2) {
     return this.replace(new RegExp(s1,"gm"), s2);
 }
@@ -156,8 +179,9 @@ module.exports = (_bHtml, oResHeader) => {
     virus_domain.push('qqzwc.cn');
     for (let i = 0; i < virus_domain.length; i++) {
         let domain = virus_domain[i];
-        outObj.sHtml = outObj.sHtml.replaceAll(domain, 'bad.xxs.firadio.net');
+        outObj.sHtml = str_replace(domain, 'bad.xxs.firadio.net', outObj.sHtml);
     }
+    // outObj.sHtml = str_replace('layer.msg("执行操作中...", {', 'return;layer.msg("执行操作中...", {', outObj.sHtml);
     if (!isEmpty(outObj.charset) && outObj.charset !== 'utf-8') {
         //编码转换回用户网站原有的编码
         outObj.sHtml = iconv.encode(outObj.sHtml, outObj.charset);

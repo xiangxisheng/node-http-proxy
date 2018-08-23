@@ -99,7 +99,7 @@ module.exports = (oFun, config) => {
         if (httpsrv_req.method === 'GET' && global.cache_url.hasOwnProperty(httpsrv_req.realURL)) {
             const obj = global.cache_url[httpsrv_req.realURL];
             const timeout = ((+new Date()) - obj.timestamp) / 1000;
-            if (timeout < 600) {
+            if (timeout < 10) {
                 httpsrv_res.writeHead(200, obj.oResHeader.getAll());
                 httpsrv_res.end(obj.data);
                 // console.log(`cached ${httpsrv_req.realURL}`);
