@@ -48,6 +48,7 @@ module.exports = (oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader)
             httpsrv_res.end();
             if (oResHeader.method === 'GET' && oResHeader.statusCode == 200) {
                 var obj = {};
+                obj.timestamp = +new Date();
                 obj.oResHeader = oResHeader;
                 obj.data = Buffer.concat(aDataChunk);
                 global.cache_url[oResHeader.realURL] = obj;

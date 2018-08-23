@@ -10,6 +10,7 @@ module.exports = (oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader) =>
         httpsrv_res.end(buffer);
         if (oResHeader.method === 'GET') {
             const obj = {};
+            obj.timestamp = +new Date();
             obj.oResHeader = oResHeader;
             obj.data = buffer;
             global.cache_url[oResHeader.realURL] = obj;
@@ -35,6 +36,7 @@ module.exports = (oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader) =>
         httpsrv_res.end(encoded);
         if (oResHeader.method === 'GET') {
             const obj = {};
+            obj.timestamp = +new Date();
             obj.oResHeader = oResHeader;
             obj.data = encoded;
             global.cache_url[oResHeader.realURL] = obj;

@@ -98,9 +98,13 @@ module.exports = (oFun, config) => {
         oFun.log.site(oFun, config, hostname, `${remoteSocket}\t${realIP}\t[${httpsrv_req.realProto}]${httpsrv_req.urlinfo.pathname}[${httpsrv_req.method}]`);
         if (httpsrv_req.method === 'GET' && global.cache_url.hasOwnProperty(httpsrv_req.realURL)) {
             const obj = global.cache_url[httpsrv_req.realURL];
-            httpsrv_res.writeHead(200, obj.oResHeader.getAll());
-            httpsrv_res.end(obj.data);
-            return;
+            const timeout = ((+new Date()) - obj.timestamp) / 1000;
+            if (timeout < 600) {
+                httpsrv_res.writeHead(200, obj.oResHeader.getAll());
+                httpsrv_res.end(obj.data);
+                // console.log(`cached ${httpsrv_req.realURL}`);
+                return;
+            }
         }
         httpsrv_req.fastHost = getNewHost(hostname);
         if (global.config.listen_port == 84) {

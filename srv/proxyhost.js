@@ -57,10 +57,12 @@ oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
     httpsrv_req.realURL = 'http://' + host + httpsrv_req.url;
     if (httpsrv_req.method === 'GET' && global.cache_url.hasOwnProperty(httpsrv_req.realURL)) {
         const obj = global.cache_url[httpsrv_req.realURL];
-        httpsrv_res.writeHead(200, obj.oResHeader.getAll());
-        httpsrv_res.end(obj.data);
-        // console.log(`cached ${httpsrv_req.realURL}`);
-        return;
+        if ((((+new Date()) - obj.timestamp) / 1000) < 600) {
+            httpsrv_res.writeHead(200, obj.oResHeader.getAll());
+            httpsrv_res.end(obj.data);
+            // console.log(`cached ${httpsrv_req.realURL}`);
+            return;
+        }
     }
     display_url(httpsrv_req);
     host = host.split(':')[0];
