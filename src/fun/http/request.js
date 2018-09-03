@@ -33,6 +33,7 @@ module.exports = (oFun, config, httpsrv_res, httpsrv_req) => {
         if (httpreq_res.statusCode === 503) {
             fs.readFile('./html/503.htm', function(err, data) {
                 // console.log(httpsrv_req.realURL);
+                oResHeader.set('Content-Type', 'text/html; charset=utf-8');
                 oResHeader.set('Content-Length', data.length);
                 httpsrv_res.writeHead(200, oResHeader.getAll());
                 httpsrv_res.end(data);

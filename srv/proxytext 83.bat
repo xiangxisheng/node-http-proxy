@@ -10,7 +10,8 @@ set NODE_PATH=%NODE_PATH%;%dirname%\..\node_modules
 echo [Start] %name%...
 node %name%
 echo [END] waiting try again...
-CALL :delay 10
+timeout 10
+REM CALL :delay 10
 goto start
 pause
 EXIT
@@ -18,7 +19,7 @@ REM =====================================
 :delay
 for /L %%i in (%1,-1,1) do (
 CALL :echo "%%i "
-choice /t 1 /d y /n >nul
+timeout 1 >nul
 )
 echo 0
 goto :eof
