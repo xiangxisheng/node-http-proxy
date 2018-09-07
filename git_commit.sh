@@ -3,17 +3,22 @@
 #git config --global core.autocrlf input
 echo =========git diff============
 git diff
+
 echo =========git pull \& git commit============
-./pause.sh
+read -s -n1 -p "Press any key to continue ... "
 git pull
 git commit
+
 echo =========git add *============
-./pause.sh
+read -s -n1 -p "Press any key to continue ... "
 git add --all
+
 echo =========git commit============
-./pause.sh
+read -s -n1 -p "Press any key to continue ... "
 git commit
+
 echo =========git push============
-./pause.sh
+read -s -n1 -p "Press any key to continue ... "
 git push
+
 echo =========EXIT============
