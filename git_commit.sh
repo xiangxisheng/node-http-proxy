@@ -4,16 +4,16 @@
 echo =========git diff============
 git diff
 echo =========git pull \& git commit============
-PAUSE
+./pause.sh
 git pull
 git commit
 echo =========git add *============
-PAUSE
+./pause.sh
 git add --all
 echo =========git commit============
-PAUSE
+./pause.sh
 git commit
 echo =========git push============
-PAUSE
+./pause.sh
 git push
 echo =========EXIT============
