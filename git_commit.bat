@@ -1,5 +1,6 @@
 @ECHO OFF
 SET path=%path%;P:\data\code\PortableGit\bin\
+SET path=%path%;X:\program\PortableGit\bin\
 git config --global core.safecrlf false
 git config --global core.autocrlf input
 ECHO =========git diff============

@@ -116,6 +116,9 @@ module.exports = (oFun, config) => {
                     data = data.replace(/\$\{pathUrl\}/g, httpsrv_req.url);
                     const buf = new Buffer(data);
                     const oResHeader = global.oClass.http.header();
+                    oResHeader.set('Expires', -1);
+                    oResHeader.set('Cache-Control', 'no-cache');
+                    oResHeader.set('Pragma', 'no-cache');
                     oResHeader.set('Content-Type', 'text/html; charset=utf-8');
                     oResHeader.set('Content-Length', buf.length);
                     httpsrv_res.writeHead(400, oResHeader.getAll());

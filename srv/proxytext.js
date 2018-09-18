@@ -10,7 +10,7 @@ const config = {};
 config.logdir = path.join(path.dirname(__dirname), 'log');
 config.listen_port = process.argv[2] ? process.argv[2] : 80;
 config.listen_addr = process.argv[3] ? process.argv[3] : '0.0.0.0';
-config.proxy_pass = 'http://10.86.3.51';//反向代理后端WEB
+config.proxy_pass = 'http://127.0.0.1';//反向代理后端WEB
 config.max_size_mb = 1.0;//限制文件大小(MB)
 config.max_size_byte = 1024 * 1024 * config.max_size_mb;
 config.limit_gzsize_mb = 0.5;//限制GZ压缩后的大小(MB)
@@ -29,6 +29,8 @@ config.beianList = (function () {
     beianList.push('firadio.cn');
     beianList.push('firadio.com');
     beianList.push('firadio.net');
+    beianList.push('ahh4.cn');
+    
     return beianList;
 })();
 global.config = config;
