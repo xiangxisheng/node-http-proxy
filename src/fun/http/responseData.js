@@ -3,15 +3,15 @@ if (!global.hasOwnProperty('cache_url')) {
     global.cache_url = {};
 }
 module.exports = (oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader) => {
-    //var chunk_totalsize = 0;
+    var chunk_totalsize = 0;
     const aDataChunk = [];
     httpreq_res.on('data', (chunk) => {
-        /*
-         chunk_totalsize += chunk.length;
-         if (chunk_totalsize > config.max_size_byte) {
-         console.log('chunk_totalsize > config.max_size_byte');
-         return;
-         }//*/
+        // console.log(oResHeader.realURL + ' [' + chunk.length + ']');
+        chunk_totalsize += chunk.length;
+        if (chunk_totalsize > config.max_size_byte) {
+            console.warn('chunk_totalsize > config.max_size_byte');
+            // return;
+        }
         //收到WEB的数据,下面转发给用户
         aDataChunk.push(chunk);
         if (sGzipFlag === 'ignore') {
@@ -22,6 +22,7 @@ module.exports = (oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader)
         }
     });
     httpreq_res.on('end', () => {
+        // console.log('[' + sGzipFlag + '] ' + oResHeader.hostname + ' [' + chunk_totalsize + ']');
         //因为WEB数据发完了,所以与用户断开连接
         if (sGzipFlag === 'de-encode') {
             const buffer = Buffer.concat(aDataChunk);

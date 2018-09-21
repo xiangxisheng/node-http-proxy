@@ -19,6 +19,7 @@ module.exports = (oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader) =>
     }
     // 需要编码压缩的
     zlib.gzip(buffer, function (err, encoded) {
+        // console.log('zlib.gzip ' + oResHeader.hostname);
         if (err) {
             console.error(`error on zlib.gzip2: ${err.message}`);
             return;
@@ -34,6 +35,7 @@ module.exports = (oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader) =>
             console.error(err, httpreq_res.statusCode, httpreq_res.statusMessage, oResHeader.getAll());
         }
         httpsrv_res.end(encoded);
+        // console.log('[res.end] zlib.gzip ' + oResHeader.hostname);
         if (oResHeader.method === 'GET') {
             const obj = {};
             obj.timestamp = +new Date();

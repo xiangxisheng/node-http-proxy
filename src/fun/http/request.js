@@ -3,17 +3,7 @@ const url = require('url');
 const fs = require('fs');
 //const zlib = require('zlib');
 module.exports = (oFun, config, httpsrv_res, httpsrv_req) => {
-    const oProxyPass = url.parse(config.proxy_pass);
     httpsrv_req.headers.host = httpsrv_req.headers.hostname;
-    const httpreq_options = {
-        protocol: oProxyPass.protocol ? oProxyPass.protocol : 'http:',
-        host: oProxyPass.hostname,
-        family: 4, //IP address family to use when resolving host
-        port: oProxyPass.port ? oProxyPass.port : 80,
-        method: httpsrv_req.method, //GET,POST,HEAD
-        path: httpsrv_req.url,
-        headers: httpsrv_req.headers//来自用户请求的头
-    };
     const callBack = (httpreq_res, oResHeader) => {
         //给用户发送WEB返回的头
         //httpreq_ctype = httpreq_ctype.trim();

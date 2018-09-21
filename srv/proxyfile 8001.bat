@@ -10,7 +10,8 @@ set NODE_PATH=%NODE_PATH%;%dirname%\..\node_modules
 echo [Start] %name%...
 node %name%
 echo [END] waiting try again...
-CALL :delay 10
+REM CALL :delay 10
+timeout 10
 goto start
 pause
 EXIT

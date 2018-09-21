@@ -3,8 +3,18 @@ const url = require('url');
 //const zlib = require('zlib');
 
 module.exports = (config, httpsrv_req, _callBack) => {
-    const oProxyPass = url.parse(config.proxy_pass);
     httpsrv_req.headers.host = httpsrv_req.headers.hostname;
+    let proxy_pass = config.proxy_pass;
+    if (httpsrv_req.headers.hostname === 'yun.mcys.top') {
+        proxy_pass = 'http://10.86.7.11:8000';
+    }
+    if (httpsrv_req.headers.hostname === 'mcys.anan.cc') {
+        proxy_pass = 'http://10.86.7.11:8000';
+    }
+    if (httpsrv_req.headers.hostname === 'mcys.feieryun.net') {
+        proxy_pass = 'http://10.86.7.11:8000';
+    }
+    const oProxyPass = url.parse(proxy_pass);
     const httpreq_options = {
         protocol: oProxyPass.protocol ? oProxyPass.protocol : 'http:',
         host: oProxyPass.hostname,
@@ -24,6 +34,7 @@ module.exports = (config, httpsrv_req, _callBack) => {
         oResHeader.statusMessage = httpreq_res.statusMessage;//WEB返回的状态消息
         oResHeader.method = httpsrv_req.method;
         oResHeader.realURL = httpsrv_req.realURL;//用户请求的URL
+        oResHeader.hostname = httpsrv_req.headers.hostname;
         _callBack(httpreq_res, oResHeader);
     });
     return httpreq;
