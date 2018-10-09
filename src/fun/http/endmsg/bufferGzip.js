@@ -1,20 +1,12 @@
 const zlib = require('zlib');
-if (!global.hasOwnProperty('cache_url')) {
-    global.cache_url = {};
-}
+
 module.exports = (oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader) => {
     if (config.disableEncoding) {
         // 跳过编码压缩的
         oResHeader.set('content-length', buffer.length);
         oResHeader.del('content-encoding');
         httpsrv_res.end(buffer);
-        if (oResHeader.method === 'GET') {
-            const obj = {};
-            obj.timestamp = +new Date();
-            obj.oResHeader = oResHeader;
-            obj.data = buffer;
-            global.cache_url[oResHeader.realURL] = obj;
-        }
+        oFun.cache.put(oResHeader, buffer);
         return;
     }
     // 需要编码压缩的
@@ -36,12 +28,6 @@ module.exports = (oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader) =>
         }
         httpsrv_res.end(encoded);
         // console.log('[res.end] zlib.gzip ' + oResHeader.hostname);
-        if (oResHeader.method === 'GET') {
-            const obj = {};
-            obj.timestamp = +new Date();
-            obj.oResHeader = oResHeader;
-            obj.data = encoded;
-            global.cache_url[oResHeader.realURL] = obj;
-        }
+        oFun.cache.put(oResHeader, encoded);
     });
 };

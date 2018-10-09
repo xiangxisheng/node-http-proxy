@@ -1,7 +1,5 @@
 const zlib = require('zlib');
-if (!global.hasOwnProperty('cache_url')) {
-    global.cache_url = {};
-}
+
 module.exports = (oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader) => {
     var chunk_totalsize = 0;
     const aDataChunk = [];
@@ -47,12 +45,8 @@ module.exports = (oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader)
         } else {
             //sGzipFlag === 'ignore'
             httpsrv_res.end();
-            if (oResHeader.method === 'GET' && oResHeader.statusCode == 200) {
-                var obj = {};
-                obj.timestamp = +new Date();
-                obj.oResHeader = oResHeader;
-                obj.data = Buffer.concat(aDataChunk);
-                global.cache_url[oResHeader.realURL] = obj;
+            if (oResHeader.statusCode == 200) {
+                oFun.cache.put(oResHeader, Buffer.concat(aDataChunk));
             }
         }
     });

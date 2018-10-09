@@ -2,6 +2,14 @@ const http = require('http');
 const url = require('url');
 const path = require('path');
 const fs = require('fs');
+
+if (!global.hasOwnProperty('cache_url')) {
+    global.cache_url = {};
+}
+if (!global.hasOwnProperty('cache_hostname')) {
+    global.cache_hostname = {};
+}
+
 Array.prototype.contain = function(val) {
     for (var i = 0; i < this.length; i++) {
         if (this[i] === val) return true;
@@ -90,22 +98,29 @@ module.exports = (oFun, config) => {
 
         return true;
     };
+    const deleteTimes = function (times, before) {
+        const minTime = (+new Date()) - before;
+        const len = times.length;
+        const newArr = [];
+        for (let i = 0; i < len; i++) {
+            if (times[i] < minTime) {
+                continue;
+            }
+            newArr.push(times[i]);
+        }
+        times.splice(0);
+        const newArrLen = newArr.length;
+        for (let i = 0; i < newArrLen; i++) {
+            times.push(newArr[i]);
+        }
+    }
     // Create an HTTP server
     oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
         const remoteSocket = httpsrv_req.headers['remoteSocket'];
         const realIP = httpsrv_req.headers['x-real-ip'];
         const hostname = httpsrv_req.headers.hostname;
-        oFun.log.site(oFun, config, hostname, `${remoteSocket}\t${realIP}\t[${httpsrv_req.realProto}]${httpsrv_req.urlinfo.pathname}[${httpsrv_req.method}]`);
-        if (httpsrv_req.method === 'GET' && global.cache_url.hasOwnProperty(httpsrv_req.realURL)) {
-            const obj = global.cache_url[httpsrv_req.realURL];
-            const timeout = ((+new Date()) - obj.timestamp) / 1000;
-            if (timeout < 10) {
-                httpsrv_res.writeHead(200, obj.oResHeader.getAll());
-                httpsrv_res.end(obj.data);
-                // console.log(`cached ${httpsrv_req.realURL}`);
-                return;
-            }
-        }
+        // oFun.log.site(oFun, config, hostname, `${remoteSocket}\t${realIP}\t[${httpsrv_req.realProto}]${httpsrv_req.urlinfo.pathname}[${httpsrv_req.method}]`);
+
         httpsrv_req.fastHost = getNewHost(hostname);
         if (global.config.listen_port == 84) {
             const skipBeian = (isFileDL(httpsrv_req.urlinfo) && isCloudflare(httpsrv_req.headers));
@@ -141,6 +156,30 @@ module.exports = (oFun, config) => {
             httpsrv_res.end();
             return;
         }
+
+        // 开始记录访问频率
+        if (!global.cache_hostname.hasOwnProperty(hostname)) {
+            global.cache_hostname[hostname] = {'count': 0, visitTime: []};
+        }
+        global.cache_hostname[hostname]['visitTime'].push(+new Date());
+        deleteTimes(global.cache_hostname[hostname]['visitTime'], 1000);
+        const visitCountPer1s = global.cache_hostname[hostname]['visitTime'].length;
+        // console.log(`visitCountPer1s=${visitCountPer1s} ${httpsrv_req.realURL}`);
+
+        if (httpsrv_req.method === 'GET' && global.cache_url.hasOwnProperty(httpsrv_req.realURL)) {
+            const obj = global.cache_url[httpsrv_req.realURL];
+            const timeout = ((+new Date()) - obj.timestamp) / 1000;
+            if (0
+                || visitCountPer1s > 10 // QPS大于10必须走缓存
+                // || timeout < 10
+                ) {
+                httpsrv_res.writeHead(200, obj.oResHeader.getAll());
+                httpsrv_res.end(obj.data);
+                console.log(`cached ${httpsrv_req.realURL}`);
+                return;
+            }
+        }
+
         const httpreq = oFun.http.request(oFun, config, httpsrv_res, httpsrv_req);
         global.oClass.http.requestForward(httpsrv_req, httpreq);
     });

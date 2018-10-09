@@ -35,6 +35,7 @@ module.exports = (config, httpsrv_req, _callBack) => {
         oResHeader.method = httpsrv_req.method;
         oResHeader.realURL = httpsrv_req.realURL;//用户请求的URL
         oResHeader.hostname = httpsrv_req.headers.hostname;
+        oResHeader.urlinfo = httpsrv_req.urlinfo
         _callBack(httpreq_res, oResHeader);
     });
     return httpreq;

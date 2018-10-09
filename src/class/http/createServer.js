@@ -49,6 +49,7 @@ module.exports = (config, _callBack) => {
         httpsrv_req.headers.hostname = httpsrv_req.headers.hostname.replace(/^\.+|\.+$/gm, '');
         // 取得用户要访问的URL的请求信息
         const urlinfo = url.parse(httpsrv_req.url);
+        urlinfo.extname = path.extname(urlinfo.pathname);
         urlinfo.dirname = getDirname(urlinfo.pathname);
         urlinfo.host = httpsrv_req.headers.host;
         urlinfo.hostname = httpsrv_req.headers.hostname;
