@@ -25,6 +25,7 @@ module.exports = (oFun, config) => {
         }
         const arr = ['', '.htm', '.html', '.php', '.asp', '.aspx'];
         arr.push('.css', '.ttf', '.woff', '.woff2');
+        arr.push('.txt');
         const extname = path.extname(urlinfo.pathname);
         if (arr.contain(extname)) {
             return false;
@@ -169,10 +170,14 @@ module.exports = (oFun, config) => {
         if (httpsrv_req.method === 'GET' && global.cache_url.hasOwnProperty(httpsrv_req.realURL)) {
             const obj = global.cache_url[httpsrv_req.realURL];
             const timeout = ((+new Date()) - obj.timestamp) / 1000;
+            const extname = obj.oResHeader.urlinfo.extname;
             if (0
                 || visitCountPer1s > 10 // QPS大于10必须走缓存
-                // || timeout < 10
-                ) {
+                //|| (timeout < 3600 && extname === '')
+                //|| (timeout < 3600 && extname === '.htm')
+                //|| (timeout < 3600 && extname === '.html')
+                || hostname === 'mmds.firadio.net'
+            ) {
                 httpsrv_res.writeHead(200, obj.oResHeader.getAll());
                 httpsrv_res.end(obj.data);
                 console.log(`cached ${httpsrv_req.realURL}`);

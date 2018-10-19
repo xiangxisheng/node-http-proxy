@@ -54,7 +54,7 @@ oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
                 return;//达到限制条件,下面就不执行了
             }
             const sGzipFlag = oFun.http.getGzipFlag(config, httpsrv_res, oResHeader);
-            oFun.http.responseData(oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader);
+            oFun.http.responseData(oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader, httpsrv_req);
         });
     }
     oClass.http.requestForward(httpsrv_req, httpreq);

@@ -69,7 +69,7 @@ oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
     config.proxy_pass = 'http://' + host + ':80';
     httpreq = oClass.http.createRequest(config, httpsrv_req, (httpreq_res, oResHeader) => {
         const sGzipFlag = oFun.http.getGzipFlag(config, httpsrv_res, oResHeader);
-        oFun.http.responseData(oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader);
+        oFun.http.responseData(oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader, httpsrv_req);
     });
     oClass.http.requestForward(httpsrv_req, httpreq);
 });

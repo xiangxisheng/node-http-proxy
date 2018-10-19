@@ -1,7 +1,26 @@
 const zlib = require('zlib');
 
-module.exports = (oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader) => {
-    if (config.disableEncoding) {
+const acceptGzip = function (headers) {
+    // 判断是否接受GZIP压缩算法
+    if (!headers.hasOwnProperty('accept-encoding')) {
+        // 默认表示不接受
+        return false;
+    }
+    // 取得acceptEncoding接受哪些算法
+    const acceptEncoding = headers['accept-encoding'].split(',');
+    for (var i = 0; i < acceptEncoding.length; i++) {
+        const ae = acceptEncoding[i].replace(/(^\s*)|(\s*$)/g, '');
+        if (ae === 'gzip') {
+            // console.log('have gzip in acceptEncoding');
+            return true;
+        }
+    }
+    return false;
+};
+module.exports = (oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader, httpsrv_req) => {
+    // 是否跳过编码（不接受GZIP肯定要跳过了）
+    var isSkipEncoding = !acceptGzip(httpsrv_req.headers);
+    if (config.disableEncoding || isSkipEncoding) {
         // 跳过编码压缩的
         oResHeader.set('content-length', buffer.length);
         oResHeader.del('content-encoding');

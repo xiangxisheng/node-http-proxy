@@ -1,6 +1,6 @@
 const zlib = require('zlib');
 
-module.exports = (oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader) => {
+module.exports = (oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader, httpsrv_req) => {
     var chunk_totalsize = 0;
     const aDataChunk = [];
     httpreq_res.on('data', (chunk) => {
@@ -33,7 +33,7 @@ module.exports = (oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader)
                 // 把解压过的代码交给html进行处理
                 decoded = oFun.process.html(decoded, oResHeader);
                 // 把处理好的HTML数据进行Gzip压缩
-                oFun.http.endmsg.bufferGzip(oFun, config, decoded, httpreq_res, httpsrv_res, oResHeader);
+                oFun.http.endmsg.bufferGzip(oFun, config, decoded, httpreq_res, httpsrv_res, oResHeader, httpsrv_req);
             });
         } else
         if (sGzipFlag === 'encode') {
@@ -41,7 +41,7 @@ module.exports = (oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader)
             if (oResHeader.contentType() === 'text/html') {
                 buffer = oFun.process.html(buffer, oResHeader);
             }
-            oFun.http.endmsg.bufferGzip(oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader);
+            oFun.http.endmsg.bufferGzip(oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader, httpsrv_req);
         } else {
             //sGzipFlag === 'ignore'
             httpsrv_res.end();

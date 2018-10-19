@@ -70,7 +70,7 @@ module.exports = (oFun, config, httpsrv_res, httpsrv_req) => {
             oResHeader.set('Content-Encoding', 'gzip');
             oResHeader.set('Content-Length-Before', oResHeader.get('content-length'));
         }
-        oFun.http.responseData(oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader);
+        oFun.http.responseData(oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader, httpsrv_req);
     };
     // 向后端WEB服务器发送HTTP请求
     return oClass.http.createRequest(config, httpsrv_req, callBack);
