@@ -17,6 +17,10 @@ config.limit_gzsize_mb = 0.5;//限制GZ压缩后的大小(MB)
 config.limit_gzsize_byte = 1024 * 1024 * config.limit_gzsize_mb;
 config.gzip_options = {};
 config.gzip_options.level = zlib.Z_BEST_COMPRESSION;
+config.error = 1;
+config.warn = 1;
+config.info = 1;
+config.log = 1;
 config.debug = 0;
 config.beianList = (function () {
     const beianList = [];
@@ -30,7 +34,7 @@ config.beianList = (function () {
     beianList.push('firadio.com');
     beianList.push('firadio.net');
     beianList.push('ahh4.cn');
-    
+    beianList.push('678wl.cn');
     return beianList;
 })();
 global.config = config;

@@ -17,6 +17,10 @@ config.limit_gzsize_mb = 0.3;//限制GZ压缩后的大小(MB)
 config.limit_gzsize_byte = 1024 * 1024 * config.limit_gzsize_mb;
 config.gzip_options = {};
 config.gzip_options.level = zlib.Z_BEST_COMPRESSION;
+config.error = 1;
+config.warn = 0;
+config.info = 0;
+config.log = 0;
 config.debug = 0;
 global.config = config;
 console.info(config);

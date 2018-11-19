@@ -15,6 +15,10 @@ config.listen_addr = process.argv[3] ? process.argv[3] : '0.0.0.0';
 config.proxy_pass = 'http://10.86.2.72';//反向代理后端WEB
 config.gzip_options = {};
 config.gzip_options.level = zlib.Z_BEST_COMPRESSION;
+config.error = 1;
+config.warn = 1;
+config.info = 1;
+config.log = 1;
 config.debug = 0;
 
 config.max_size_mb = 0.8;//限制文件大小(MB)
