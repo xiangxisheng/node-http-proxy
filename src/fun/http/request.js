@@ -72,6 +72,11 @@ module.exports = (oFun, config, httpsrv_res, httpsrv_req) => {
         }
         oFun.http.responseData(oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader, httpsrv_req);
     };
+    httpsrv_req.url = (function (urlinfo) {
+        // urlinfo = oFun.common.str_replace('.woff2-v=', '.woff2?v=', urlinfo)
+        // console.info(urlinfo);
+        return urlinfo;
+    })(httpsrv_req.url);
     // 向后端WEB服务器发送HTTP请求
     return oClass.http.createRequest(config, httpsrv_req, callBack);
 };
