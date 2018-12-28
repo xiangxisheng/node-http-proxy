@@ -14,6 +14,12 @@ module.exports = (config, httpsrv_req, _callBack) => {
     if (httpsrv_req.headers.hostname === 'mcys.feieryun.net') {
         proxy_pass = 'http://10.86.7.11:8000';
     }
+    if (httpsrv_req.headers.hostname === 'ali.ciyuanss.tw') {
+        proxy_pass = 'http://vps.firadio.net:29870';
+    }
+    if (httpsrv_req.headers.hostname === 'chunqiu47.club') {
+        proxy_pass = 'http://vps.firadio.net:29633';
+    }
     const oProxyPass = url.parse(proxy_pass);
     const httpreq_options = {
         protocol: oProxyPass.protocol ? oProxyPass.protocol : 'http:',
