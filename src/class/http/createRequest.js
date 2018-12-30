@@ -1,7 +1,34 @@
 const http = require('http');
 const url = require('url');
 //const zlib = require('zlib');
-
+const isDomain = function (httpsrv_req, domain) {
+    const hostname = httpsrv_req.headers.hostname;
+    return isDomain2(hostname, domain);
+};
+const isDomain2 = function (hostname, domain) {
+    const toArr = function (domain) {
+        const retArr = [];
+        const arr = domain.split('.');
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i] === '') continue;
+            retArr.push(arr[i]);
+        }
+        return retArr;
+    };
+    const hostnameArr = toArr(hostname);
+    const domainArr = toArr(domain);
+    if (hostnameArr.length < domainArr.length) {
+        return false;
+    }
+    for (var i = 0; i < domainArr.length; i++) {
+        const name1 = hostnameArr[hostnameArr.length - i - 1];
+        const name2 = domainArr[domainArr.length - i - 1];
+        if (name1 !== name2) {
+            return false;
+        }
+    }
+    return true;
+};
 module.exports = (config, httpsrv_req, _callBack) => {
     httpsrv_req.headers.host = httpsrv_req.headers.hostname;
     let proxy_pass = config.proxy_pass;
@@ -17,7 +44,10 @@ module.exports = (config, httpsrv_req, _callBack) => {
     if (httpsrv_req.headers.hostname === 'ali.ciyuanss.tw') {
         proxy_pass = 'http://vps.firadio.net:29870';
     }
-    if (httpsrv_req.headers.hostname === 'chunqiu47.club') {
+    if (isDomain(httpsrv_req, 'ciyuanss.tw')) {
+        proxy_pass = 'http://vps.firadio.net:29870';
+    }
+    if (isDomain(httpsrv_req, 'chunqiu47.club')) {
         proxy_pass = 'http://vps.firadio.net:29633';
     }
     const oProxyPass = url.parse(proxy_pass);
