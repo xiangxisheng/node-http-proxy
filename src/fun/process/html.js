@@ -107,12 +107,18 @@ const setSrcPath = function (oResHeader, src, field, that) {
         that.attr(field, newurl + src);
         return;
     }
+    var dirname = (function (dirname) {
+        if (dirname.indexOf('/') !== 0) {
+            dirname = '/' + dirname;
+        }
+        return dirname;
+    })(oResHeader.urlinfo.dirname);
     if (src.indexOf('./') === 0) {
         var src2 = src.substr(2);
-        that.attr(field, newurl + oResHeader.urlinfo.dirname + src2);
+        that.attr(field, newurl + dirname + src2);
         return;
     }
-    that.attr(field, newurl + oResHeader.urlinfo.dirname + src);
+    that.attr(field, newurl + dirname + src);
 };
 const str_replace_one = function(fulltext, subtext, newtext) {
     const i1 = fulltext.indexOf(subtext);
