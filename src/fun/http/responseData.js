@@ -31,16 +31,14 @@ module.exports = (oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader,
                 }
                 //console.log(sHtml.substr(0, 50));
                 // 把解压过的代码交给html进行处理
-                decoded = oFun.process.html(decoded, oResHeader);
+                decoded = oFun.process.process(decoded, oResHeader);
                 // 把处理好的HTML数据进行Gzip压缩
                 oFun.http.endmsg.bufferGzip(oFun, config, decoded, httpreq_res, httpsrv_res, oResHeader, httpsrv_req);
             });
         } else
         if (sGzipFlag === 'encode') {
             var buffer = Buffer.concat(aDataChunk);
-            if (oResHeader.contentType() === 'text/html') {
-                buffer = oFun.process.html(buffer, oResHeader);
-            }
+            buffer = oFun.process.process(buffer, oResHeader);
             oFun.http.endmsg.bufferGzip(oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader, httpsrv_req);
         } else {
             //sGzipFlag === 'ignore'

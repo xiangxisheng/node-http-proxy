@@ -20,14 +20,18 @@ Array.prototype.contain = function(val) {
 module.exports = (oFun, config) => {
 
     const isFileDL = function (urlinfo) {
+        // 判断是否文件下载类的，
+        // 1：非下载类的页面或图片禁止302跳转8001端口
+        // 2：非下载类的页面或图片必须备案才能访问
         if (urlinfo.pathname === '/') {
             return false;
         }
         const arr = ['', '.htm', '.html', '.php', '.asp', '.aspx'];
         arr.push('.css', '.ttf', '.woff', '.woff2');
-        arr.push('.txt');
-        const extname = path.extname(urlinfo.pathname);
-        if (arr.contain(extname)) {
+        arr.push('.txt', '.js');
+        arr.push('.jpg', '.gif', '.png', '.ico');
+        // const extname = path.extname(urlinfo.pathname);
+        if (arr.contain(urlinfo.extname)) {
             return false;
         }
         // console.log(extname);
@@ -121,10 +125,10 @@ module.exports = (oFun, config) => {
         const realIP = httpsrv_req.headers['x-real-ip'];
         const hostname = httpsrv_req.headers.hostname;
         // oFun.log.site(oFun, config, hostname, `${remoteSocket}\t${realIP}\t[${httpsrv_req.realProto}]${httpsrv_req.urlinfo.pathname}[${httpsrv_req.method}]`);
-
+        const bFileDL = isFileDL(httpsrv_req.urlinfo);
         httpsrv_req.fastHost = getNewHost(hostname);
         if (global.config.listen_port == 84) {
-            const skipBeian = (isFileDL(httpsrv_req.urlinfo) && isCloudflare(httpsrv_req.headers));
+            const skipBeian = (bFileDL && isCloudflare(httpsrv_req.headers));
             if (!isBeian(hostname) && !skipBeian) {
                 fs.readFile('./html/non-beian.htm', 'utf8', function(err, data) {
                     data = data.replace(/\$\{hostname\}/g, hostname);
@@ -147,7 +151,7 @@ module.exports = (oFun, config) => {
         //oFun.log(`${realip}\t${proto}://${httpsrv_req.headers.host}${httpsrv_req.urlinfo.pathname}[${httpsrv_req.method}]`);
         if (1
             && httpsrv_req.method === 'GET'
-            && isFileDL(httpsrv_req.urlinfo)
+            && bFileDL
             && global.config.listen_port != 84
         ) {
             const port = (httpsrv_req.realProto === 'http') ? 8001 : 4431;

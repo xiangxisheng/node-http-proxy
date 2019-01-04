@@ -109,10 +109,10 @@ const setSrcPath = function (oResHeader, src, field, that) {
     }
     if (src.indexOf('./') === 0) {
         var src2 = src.substr(2);
-        that.attr(field, newurl + oResHeader.urlinfo.dirname + '/' + src2);
+        that.attr(field, newurl + oResHeader.urlinfo.dirname + src2);
         return;
     }
-    that.attr(field, newurl + oResHeader.urlinfo.dirname + '/' + src);
+    that.attr(field, newurl + oResHeader.urlinfo.dirname + src);
 };
 const str_replace_one = function(fulltext, subtext, newtext) {
     const i1 = fulltext.indexOf(subtext);
@@ -150,6 +150,14 @@ module.exports = (_bHtml, oResHeader) => {
             oResHeader.charset(outObj.charset);
         }
     }
+    const isDenyHtml = (function (sHtml) {
+        if (sHtml.indexOf('空中俏佳人') >= 0) return true;
+        if (sHtml.indexOf('烈火狼之笼斗') >= 0) return true;
+        return false;
+    })(outObj.sHtml);
+    if (isDenyHtml) {
+        return("<meta http-equiv=Content-Type content=text/html;charset=utf-8><title>该页已被屏蔽</title><h2>由于当前页面含有非法关键字，已被屏蔽。</h2>如有疑问请工作人员联系QQ: 309385018");
+    }
     // console.info(outObj.charset, oResHeader.realURL);
     const $ = cheerio.load(outObj.sHtml);
     const title = $('title').text();
@@ -160,7 +168,7 @@ module.exports = (_bHtml, oResHeader) => {
         oTitles[title] = 0;
         console.debug(outObj.charset, oResHeader.statusCode, title, oResHeader.realURL);
     }
-    if (0 && oResHeader.realProto === 'http') {
+    if (1 && oResHeader.realProto === 'http') {
         $("[src!='']").each(function(i, elem) {
             let src = $(this).attr('src');
             setSrcPath(oResHeader, src, 'src', $(this));

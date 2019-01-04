@@ -8,7 +8,12 @@ module.exports = (config, httpsrv_res, oResHeader) => {
     if (oResHeader.exists('content-encoding')) {
         const encoding = oResHeader.get('content-encoding');
         //console.log(encoding + ',' + httpreq_ctype + ',' + httpsrv_req.realURL);
-        const isText = (oResHeader.contentType() === 'text/html');
+        const isText = (function (oResHeader) {
+            if (oResHeader.contentType() === 'text/html') return true;
+            if (oResHeader.contentType() === 'text/css') return true;
+            if (oResHeader.urlinfo.extname === '.css') return true;
+            return false;
+        })(oResHeader);
         if (encoding === 'gzip' && isText) {
             sGzipFlag = 'de-encode';
             //var gunzipStream = zlib.createGunzip();

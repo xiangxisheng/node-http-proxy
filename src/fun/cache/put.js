@@ -23,6 +23,10 @@ function isNeedCache(oResHeader) {
 }
 module.exports = (oResHeader, data) => {
     // console.log(oResHeader.realURL);
+    if (data.length > 1024 * 1024 * 10) {
+        // 超过10M不缓存
+        return;
+    }
     if (isNeedCache(oResHeader)) {
         const obj = {};
         obj.timestamp = +new Date();
