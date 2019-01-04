@@ -47,7 +47,8 @@ oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
         httpsrv_req.headers.hostname = host;
         httpreq = oClass.http.createRequest(config, httpsrv_req, (httpreq_res, oResHeader) => {
             if (!oResHeader.exists('Access-Control-Allow-Origin')) {
-                oResHeader.set('Access-Control-Allow-Origin', '*'); // 保持长连接
+				// 允许任何网站调用该页面
+                oResHeader.set('Access-Control-Allow-Origin', '*');
             }
             httpsrv_res.writeHead(httpreq_res.statusCode, httpreq_res.statusMessage, oResHeader.getAll());
             httpreq_res.on('data', (chunk) => {
