@@ -108,15 +108,16 @@ const setSrcPath = function (oResHeader, src, field, that) {
         return;
     }
     var dirname = (function (dirname) {
-        if (dirname.indexOf('/') !== 0) {
+        if (dirname.substr(0, 1) !== '/') {
             dirname = '/' + dirname;
+        }
+        if (dirname.substr(-1, 1) !== '/') {
+            dirname = dirname + '/';
         }
         return dirname;
     })(oResHeader.urlinfo.dirname);
     if (src.indexOf('./') === 0) {
-        var src2 = src.substr(2);
-        that.attr(field, newurl + dirname + src2);
-        return;
+        src = src.substr(2);
     }
     that.attr(field, newurl + dirname + src);
 };
