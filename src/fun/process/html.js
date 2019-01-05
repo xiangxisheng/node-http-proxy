@@ -205,6 +205,9 @@ module.exports = (_bHtml, oResHeader) => {
     }
     if (1 && oResHeader.realProto === 'http') {
         $("[src!='']").each(function(i, elem) {
+            if (elem.type === 'tag' && elem.name === 'frame') {
+                return;
+            }
             let src = $(this).attr('src');
             setSrcPath(oResHeader, src, 'src', $(this));
         });
