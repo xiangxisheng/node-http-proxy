@@ -77,6 +77,7 @@ const checkCharset = function (_bHtml, _charset, outObj) {
     return false;
 };
 const urlParse = function (srcfile) {
+    // 写这个函数是因为url.parse不能解析“//”开头的网址
     const ret = {};
     ret.host = '';
     ret.path = srcfile;
@@ -84,13 +85,17 @@ const urlParse = function (srcfile) {
     for (let i = 0; i < arr.length; i++) {
         const v = arr[i];
         if (srcfile.indexOf(v) === 0) {
+            // 比如成功找到https://
             const sub1 = v.length;
             const sub2 = srcfile.indexOf('/', sub1);
             if (sub2 !== -1) {
                 ret.host = srcfile.substring(sub1, sub2);
                 ret.path = srcfile.substr(sub2);
-                break;
+            } else {
+                ret.host = srcfile.substr(sub1);
+                ret.path = '';
             }
+            break;
         }
     }
     return ret;
