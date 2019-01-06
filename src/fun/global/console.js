@@ -6,19 +6,19 @@ module.exports = function () {
         const isExistType = console.hasOwnProperty(type);
         const _console_type = isExistType ? console[type] : null;
         console[type] = function () {
-            if (!config.debug && type === 'debug') {
+            if (!config.sys.diag.debug && type === 'debug') {
                 return;
             }
-            if (!config.log && type === 'log') {
+            if (!config.sys.diag.log && type === 'log') {
                 return;
             }
-            if (!config.info && type === 'info') {
+            if (!config.sys.diag.info && type === 'info') {
                 return;
             }
-            if (!config.warn && type === 'warn') {
+            if (!config.sys.diag.warn && type === 'warn') {
                 return;
             }
-            if (!config.error && type === 'error') {
+            if (!config.sys.diag.error && type === 'error') {
                 return;
             }
             const argv = Array.prototype.slice.call(arguments);

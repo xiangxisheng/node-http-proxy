@@ -11,26 +11,20 @@ oFun.global.console();
 const config = {};
 config.domains = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/domains.json'), 'utf-8'));
 config.servers = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/servers.json'), 'utf-8'));
-config.logdir = path.join(path.dirname(__dirname), 'log');
-config.listen_port = process.argv[2] ? process.argv[2] : 80;
-config.listen_addr = process.argv[3] ? process.argv[3] : '0.0.0.0';
-config.proxy_pass = 'http://10.86.2.72';//反向代理后端WEB
-config.gzip_options = {};
-config.gzip_options.level = zlib.Z_BEST_COMPRESSION;
-config.error = 1;
-config.warn = 1;
-config.info = 1;
-config.log = 1;
-config.debug = 0;
-
-config.max_size_mb = 0.8;//限制文件大小(MB)
-config.max_size_byte = 1024 * 1024 * config.max_size_mb;
-config.limit_gzsize_mb = 0.3;//限制GZ压缩后的大小(MB)
-config.limit_gzsize_byte = 1024 * 1024 * config.limit_gzsize_mb;
-
-config.key = fs.readFileSync('cert/feieryun.net.key');
-config.cert = fs.readFileSync('cert/feieryun.net.cer');
-
+config.sys = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/sys.json'), 'utf-8'));
+config.sys.diag.logdir = path.join(path.dirname(__dirname), 'log');
+config.sys.http.listen_addr = process.argv[3] ? process.argv[3] : '0.0.0.0';
+config.sys.http.listen_port = process.argv[2] ? parseInt(process.argv[2], 10) : 80;
+config.sys.http.ssl.enabled = (config.sys.http.listen_port.toString().indexOf('443') === 0);
+config.sys.http.ssl.key = fs.readFileSync('cert/feieryun.net.key');
+config.sys.http.ssl.cert = fs.readFileSync('cert/feieryun.net.cer');
+config.sys.http.proxy_pass = 'http://10.86.2.72';//反向代理后端WEB
+config.sys.http.limit = {};
+config.sys.http.limit.enabled = 0;
+config.sys.http.limit.max_size_byte = 1024 * 1024 * 0.8;//限制文件大小(字节)
+config.sys.http.limit.max_gzsize_byte = 1024 * 1024 * 0.3;//限制GZ压缩后的大小(字节)
+config.sys.http.process = 0; //开启文本处理模块（一般只需在SLB中开启）
+config.sys.http.beiancheck = 0; //是否开启备案检测
 global.config = config;
 console.info(config);
 oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {

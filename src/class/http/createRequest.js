@@ -31,7 +31,7 @@ const isDomain2 = function (hostname, domain) {
 };
 module.exports = (config, httpsrv_req, _callBack) => {
     httpsrv_req.headers.host = httpsrv_req.headers.hostname;
-    let proxy_pass = config.proxy_pass;
+    let proxy_pass = config.sys.http.proxy_pass;
     if (httpsrv_req.headers.hostname === 'yun.mcys.top') {
         proxy_pass = 'http://10.86.7.11:8000';
     }

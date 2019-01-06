@@ -35,8 +35,8 @@ module.exports = (oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader, ht
             console.error(`error on zlib.gzip2: ${err.message}`);
             return;
         }
-        if (config.limit_gzsize_byte && encoded.length > config.limit_gzsize_byte) {
-            oFun.http.endmsg.sizeLimited(httpsrv_res, encoded.length, config.limit_gzsize_byte);
+        if (config.sys.http.limit.enabled && config.sys.http.limit.max_gzsize_byte && encoded.length > config.sys.http.limit.max_gzsize_byte) {
+            oFun.http.endmsg.sizeLimited(httpsrv_res, encoded.length, config.sys.http.limit.max_gzsize_byte);
             return;
         }
         oResHeader.set('content-length', encoded.length);

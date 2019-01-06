@@ -15,7 +15,7 @@ module.exports = (_type, _argv) => {
         }
     }
     const log_text = aLogtext.join(' ');
-    var logpath = global.config.logdir;
+    var logpath = global.config.sys.diag.logdir;
     logpath = path.join(logpath, 'console');
     logpath = path.join(logpath, global.oFun.common.date('Ymd'));
     global.oFun.common.createDir(logpath, function () {

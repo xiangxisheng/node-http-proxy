@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 module.exports = (oFun, config, _host, _msg) => {
     const log_text = global.oFun.common.date('Y-m-d H:i:s.e') + ' ' + _msg;
-    var logpath = config.logdir;
+    var logpath = config.sys.diag.logdir;
     var domain = '[none]';
     if (_host) {
         domain = _host.split(':')[0];

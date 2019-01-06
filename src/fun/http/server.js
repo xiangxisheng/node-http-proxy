@@ -57,8 +57,8 @@ module.exports = (oFun, config) => {
     };
     const isBeian = function (host) {
         host = host + '.';
-        console.log(host);
-        const beianList = global.config.beianList;
+        // console.log('host=', host);
+        const beianList = global.config.sys.http.beian.domains;
         const len = beianList.length;
         for (var i = 0; i < len; i++) {
             const domain = beianList[i];
@@ -83,7 +83,7 @@ module.exports = (oFun, config) => {
         if (headers.hasOwnProperty('Referer')) {
             return true;
         }
-        console.log(headers);
+        console.log('isCloudflare', headers);
 
         if (!headers.hasOwnProperty('cf-ipcountry')) {
             return false;
@@ -127,7 +127,7 @@ module.exports = (oFun, config) => {
         // oFun.log.site(oFun, config, hostname, `${remoteSocket}\t${realIP}\t[${httpsrv_req.realProto}]${httpsrv_req.urlinfo.pathname}[${httpsrv_req.method}]`);
         const bFileDL = isFileDL(httpsrv_req.urlinfo);
         httpsrv_req.fastHost = getNewHost(hostname);
-        if (global.config.listen_port == 84) {
+        if (config.sys.http.beian.enabled) {
             const skipBeian = (bFileDL && isCloudflare(httpsrv_req.headers));
             if (!isBeian(hostname) && !skipBeian) {
                 fs.readFile('./html/non-beian.htm', 'utf8', function(err, data) {
@@ -152,7 +152,7 @@ module.exports = (oFun, config) => {
         if (1
             && httpsrv_req.method === 'GET'
             && bFileDL
-            && global.config.listen_port != 84
+            && !config.sys.http.beian.enabled
         ) {
             const port = (httpsrv_req.realProto === 'http') ? 8001 : 4431;
             var newurl = httpsrv_req.realProto + '://' + httpsrv_req.fastHost + ':' + port + httpsrv_req.url;

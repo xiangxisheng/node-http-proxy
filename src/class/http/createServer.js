@@ -77,7 +77,7 @@ module.exports = (config, _callBack) => {
         // global.oFun.log.site(global.oFun, config, httpsrv_req.headers.host, `${remoteSocket}\t${realIP}\t[${realProto}]${urlinfo.pathname}[${httpsrv_req.method}]`);
         _callBack(httpsrv_req, httpsrv_res);
     };
-    let httpsrv = (config.listen_port.toString().indexOf('443') === 0) ? https.createServer(config, callback) : http.createServer(callback);
+    let httpsrv = (config.sys.http.ssl.enabled) ? https.createServer(config.sys.http.ssl, callback) : http.createServer(callback);
     httpsrv.on('connect', (req, cltSocket, head) => {
         // connect to an origin server
         console.info('connect to an origin server');
@@ -85,7 +85,7 @@ module.exports = (config, _callBack) => {
     httpsrv.on('error', (err) => {
         console.error(err);
     });
-    httpsrv.listen(config.listen_port, config.listen_addr, () => {
-        console.info('httpserver.listen in ' + config.listen_addr + ':' + config.listen_port);
+    httpsrv.listen(config.sys.http.listen_port, config.sys.http.listen_addr, () => {
+        console.info('httpserver.listen in ' + config.sys.http.listen_addr + ':' + config.sys.http.listen_port);
     });
 };

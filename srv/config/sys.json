@@ -1,0 +1,41 @@
+{
+	"diag": {
+		"logdir": "log",
+		"error": 1,
+		"warn": 1,
+		"info": 1,
+		"log": 1,
+		"debug": 0
+	},
+	"http": {
+		"ssl": {
+			"enabled": 1
+		},
+		"listen_port": 80,
+		"listen_addr": "0.0.0.0",
+		"proxy_pass": "http://127.0.0.1:8080",
+		"limit": {
+			"enabled": 1,
+			"max_size_byte": 1048576,
+			"max_gzsize_byte": 524288
+		},
+		"process": 1,
+		"beian": {
+			"enabled": 1,
+			"domains": [
+				"2398dj.com",
+				"28820.com",
+				"anan.cc",
+				"feieryun.cn",
+				"feieryun.com",
+				"feieryun.net",
+				"firadio.cn",
+				"firadio.com",
+				"firadio.net",
+				"ahh4.cn",
+				"678wl.cn",
+				"enoyu.cn"
+			]
+		}
+	}
+}

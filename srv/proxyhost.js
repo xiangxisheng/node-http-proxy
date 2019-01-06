@@ -9,17 +9,15 @@ const oClass = require(__dirname + '/../src/class.js');
 global.oClass = oClass;
 oFun.global.console();
 const config = {};
-config.logdir = path.join(path.dirname(__dirname), 'log');
-config.listen_port = process.argv[2] ? process.argv[2] : 80;
-config.listen_addr = process.argv[3] ? process.argv[3] : '0.0.0.0';
-config.gzip_options = {};
-config.gzip_options.level = zlib.Z_BEST_COMPRESSION;
-config.error = 1;
-config.warn = 1;
-config.info = 1;
-config.log = 1;
-config.debug = 0;
 config.disableEncoding = true;
+config.domains = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/domains.json'), 'utf-8'));
+config.servers = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/servers.json'), 'utf-8'));
+config.sys = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/sys.json'), 'utf-8'));
+config.sys.diag.logdir = path.join(path.dirname(__dirname), 'log');
+config.sys.http.listen_addr = process.argv[3] ? process.argv[3] : '0.0.0.0';
+config.sys.http.listen_port = process.argv[2] ? parseInt(process.argv[2], 10) : 80;
+config.sys.http.process = 0; //开启文本处理模块（一般只需在SLB中开启）
+config.sys.http.beiancheck = 0; //是否开启备案检测
 global.config = config;
 console.info(config);
 
@@ -70,7 +68,7 @@ oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
     }
     display_url(httpsrv_req);
     host = host.split(':')[0];
-    config.proxy_pass = 'http://' + host + ':80';
+    config.sys.http.proxy_pass = 'http://' + host + ':80';
     httpreq = oClass.http.createRequest(config, httpsrv_req, (httpreq_res, oResHeader) => {
         const sGzipFlag = oFun.http.getGzipFlag(config, httpsrv_res, oResHeader);
         oFun.http.responseData(oFun, config, httpsrv_res, httpreq_res, sGzipFlag, oResHeader, httpsrv_req);
