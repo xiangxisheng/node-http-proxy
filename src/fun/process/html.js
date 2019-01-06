@@ -194,7 +194,7 @@ module.exports = (_bHtml, oResHeader) => {
         return false;
     })(outObj.sHtml);
     if (isDenyHtml) {
-        return("<meta http-equiv=Content-Type content=text/html;charset=utf-8><title>该页已被屏蔽</title><h2>由于当前页面含有非法关键字，已被屏蔽。</h2>如有疑问请工作人员联系QQ: 309385018");
+        return("<meta http-equiv=Content-Type content=text/html;charset=utf-8><title>该页已被屏蔽</title><h2>由于当前页面含有非法关键字，已被屏蔽。</h2>如有疑问请联系工作人员QQ: 309385018");
     }
     // console.info(outObj.charset, oResHeader.realURL);
     const cheerio_config = {};
@@ -225,7 +225,7 @@ module.exports = (_bHtml, oResHeader) => {
             setSrcPath(oResHeader, href, 'href', $(this));
         });
         outObj.sHtml = $.html();
-        outObj.sHtml = html_decode(outObj.sHtml);
+        // outObj.sHtml = html_decode(outObj.sHtml);
     }
     const virus_domain = [];
     virus_domain.push('qqzwc.cn');
