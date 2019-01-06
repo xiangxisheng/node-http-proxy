@@ -17,7 +17,7 @@ config.sys.diag.logdir = path.join(path.dirname(__dirname), 'log');
 config.sys.http.listen_addr = process.argv[3] ? process.argv[3] : '0.0.0.0';
 config.sys.http.listen_port = process.argv[2] ? parseInt(process.argv[2], 10) : 80;
 config.sys.http.process = 0; //开启文本处理模块（一般只需在SLB中开启）
-config.sys.http.beiancheck = 0; //是否开启备案检测
+config.sys.http.beian.enabled = 0; //是否开启备案检测
 global.config = config;
 console.info(config);
 

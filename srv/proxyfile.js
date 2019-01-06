@@ -24,7 +24,7 @@ config.sys.http.limit.enabled = 0;
 config.sys.http.limit.max_size_byte = 1024 * 1024 * 0.8;//限制文件大小(字节)
 config.sys.http.limit.max_gzsize_byte = 1024 * 1024 * 0.3;//限制GZ压缩后的大小(字节)
 config.sys.http.process = 0; //开启文本处理模块（一般只需在SLB中开启）
-config.sys.http.beiancheck = 0; //是否开启备案检测
+config.sys.http.beian.enabled = 0; //是否开启备案检测
 global.config = config;
 console.info(config);
 oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
@@ -41,7 +41,7 @@ oClass.http.createServer(config, (httpsrv_req, httpsrv_res) => {
         httpsrv_req.headers.hostname = host;
         httpreq = oClass.http.createRequest(config, httpsrv_req, (httpreq_res, oResHeader) => {
             if (!oResHeader.exists('Access-Control-Allow-Origin')) {
-				// 允许任何网站调用该页面
+                // 允许任何网站调用该页面
                 oResHeader.set('Access-Control-Allow-Origin', '*');
             }
             httpsrv_res.writeHead(httpreq_res.statusCode, httpreq_res.statusMessage, oResHeader.getAll());

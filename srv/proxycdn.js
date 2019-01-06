@@ -27,7 +27,7 @@ config.sys.http.limit.enabled = 0;
 config.sys.http.limit.max_size_byte = 1024 * 1024 * 0.8;//限制文件大小(字节)
 config.sys.http.limit.max_gzsize_byte = 1024 * 1024 * 0.3;//限制GZ压缩后的大小(字节)
 config.sys.http.process = 0; //开启文本处理模块（一般只需在SLB中开启）
-config.sys.http.beiancheck = 0; //是否开启备案检测
+config.sys.http.beian.enabled = 0; //是否开启备案检测
 global.config = config;
 console.info(config);
 oFun.http.server(oFun, config);
