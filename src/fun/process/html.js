@@ -105,8 +105,10 @@ const setSrcPath = function (oResHeader, src, field, that) {
     var newurl = oResHeader.realProto + '://' + oResHeader.fastHost + ':' + port;
     const srcinfo = urlParse(src);
     src = srcinfo.path;
-    if (srcinfo.host && srcinfo.host !== oResHeader.urlinfo.host) {
-        return;
+    if (srcinfo.host) {
+        if (srcinfo.host !== oResHeader.urlinfo.host) {
+            return;
+        }
     }
     if (src.indexOf('/') === 0) {
         that.attr(field, newurl + src);
@@ -165,11 +167,11 @@ const html_decode1 = function (str) {
  */
 const html_decode = function (str) {
     // 一般可以先转换为标准 unicode 格式（有需要就添加：当返回的数据呈现太多\\\u 之类的时）
-    str = unescape(str.replace(/\\u/g, "%u"));
+    // str = unescape(str.replace(/\\u/g, "%u"));
     // 再对实体符进行转义
     // 有 x 则表示是16进制，$1 就是匹配是否有 x，$2 就是匹配出的第二个括号捕获到的内容，将 $2 以对应进制表示转换
-    str = str.replace(/&#(x)?(\w+);/g, function($, $1, $2) {
-      return String.fromCharCode(parseInt($2, $1? 16: 10));
+    str = str.replace(/&#(x)?(\w{4});/g, function($, $1, $2) {
+        return String.fromCharCode(parseInt($2, $1 ? 16: 10));
     });
     return str;
 }
@@ -198,7 +200,7 @@ module.exports = (_bHtml, oResHeader) => {
     }
     // console.info(outObj.charset, oResHeader.realURL);
     const cheerio_config = {};
-    cheerio_config.decodeEntities = false;
+    // cheerio_config.decodeEntities = false;
     const $ = cheerio.load(outObj.sHtml, cheerio_config);
     const title = $('title').text();
     if (oTitles.hasOwnProperty(title)) {
@@ -225,7 +227,7 @@ module.exports = (_bHtml, oResHeader) => {
             setSrcPath(oResHeader, href, 'href', $(this));
         });
         outObj.sHtml = $.html();
-        // outObj.sHtml = html_decode(outObj.sHtml);
+        outObj.sHtml = html_decode(outObj.sHtml);
     }
     const virus_domain = [];
     virus_domain.push('qqzwc.cn');

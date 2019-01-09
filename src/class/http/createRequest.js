@@ -29,28 +29,59 @@ const isDomain2 = function (hostname, domain) {
     }
     return true;
 };
+const getServerByHost = function (hostname) {
+    // 通过hostname取得服务器英文名，例如cn641
+    const DomainToArr = function (domain) {
+        const retArr = [];
+        const arr = domain.split('.');
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i] === '') continue;
+            retArr.push(arr[i]);
+        }
+        return retArr;
+    };
+    const arr = DomainToArr(hostname);
+    for (var i = 0; i < arr.length -1; i++) {
+        const domain1 = arr.slice(i).join('.');
+        if (config.domains.hasOwnProperty(domain1)) {
+            return config.domains[domain1];
+        }
+        const domain2 = '*.' + arr.slice(i + 1).join('.');
+        if (config.domains.hasOwnProperty(domain2)) {
+            return config.domains[domain2];
+        }
+    }
+    return false;
+};
+const getInfoByServerName = function (serverName, serverType) {
+    if (!config.servers.hasOwnProperty(serverName)) {
+        return false;
+    }
+    const srvconf = config.servers[serverName];
+    if (!srvconf.enabled) {
+        return false;
+    }
+    if (!srvconf.servers.hasOwnProperty(serverType)) {
+        return false;
+    }
+    return srvconf.servers[serverType];
+};
 module.exports = (config, httpsrv_req, _callBack) => {
     httpsrv_req.headers.host = httpsrv_req.headers.hostname;
-    let proxy_pass = config.sys.http.proxy_pass;
-    if (httpsrv_req.headers.hostname === 'yun.mcys.top') {
-        proxy_pass = 'http://10.86.7.11:8000';
+    let oProxyPass = url.parse(config.sys.http.proxy_pass);
+    // 首先取得服务器英文名，例如cn641
+    const serverName = getServerByHost(httpsrv_req.headers.hostname);
+    if (serverName) {
+        // 然后取得服务器的信息
+        const serverInfo = getInfoByServerName(serverName, config.sys.http.type);
+        if (serverInfo) {
+            oProxyPass = {};
+            oProxyPass.protocol = serverInfo[0] + ':';
+            oProxyPass.hostname = serverInfo[1];
+            oProxyPass.port = serverInfo[2];
+            console.log(oProxyPass);
+        }
     }
-    if (httpsrv_req.headers.hostname === 'mcys.anan.cc') {
-        proxy_pass = 'http://10.86.7.11:8000';
-    }
-    if (httpsrv_req.headers.hostname === 'mcys.feieryun.net') {
-        proxy_pass = 'http://10.86.7.11:8000';
-    }
-    if (httpsrv_req.headers.hostname === 'ali.ciyuanss.tw') {
-        proxy_pass = 'http://vps.firadio.net:29870';
-    }
-    if (isDomain(httpsrv_req, 'ciyuanss.tw')) {
-        proxy_pass = 'http://vps.firadio.net:29870';
-    }
-    if (isDomain(httpsrv_req, 'chunqiu47.club')) {
-        proxy_pass = 'http://vps.firadio.net:29633';
-    }
-    const oProxyPass = url.parse(proxy_pass);
     const httpreq_options = {
         protocol: oProxyPass.protocol ? oProxyPass.protocol : 'http:',
         host: oProxyPass.hostname,

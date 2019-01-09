@@ -17,6 +17,7 @@ config.sys.diag.warn = 0;
 config.sys.diag.info = 0;
 config.sys.diag.log = 0;
 config.sys.diag.debug = 0;
+config.sys.http.type = 'CDN';
 config.sys.http.listen_addr = process.argv[3] ? process.argv[3] : '0.0.0.0';
 config.sys.http.listen_port = process.argv[2] ? parseInt(process.argv[2], 10) : 80;
 config.sys.http.ssl.enabled = 0;

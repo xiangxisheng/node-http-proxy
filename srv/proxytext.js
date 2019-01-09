@@ -12,6 +12,7 @@ config.domains = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/domains
 config.servers = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/servers.json'), 'utf-8'));
 config.sys = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/sys.json'), 'utf-8'));
 config.sys.diag.logdir = path.join(path.dirname(__dirname), 'log');
+config.sys.http.type = 'SLB';
 config.sys.http.listen_addr = process.argv[3] ? process.argv[3] : '0.0.0.0';
 config.sys.http.listen_port = process.argv[2] ? parseInt(process.argv[2], 10) : 80;
 config.sys.http.ssl.enabled = 0;
