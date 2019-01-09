@@ -79,7 +79,7 @@ module.exports = (config, httpsrv_req, _callBack) => {
             oProxyPass.protocol = serverInfo[0] + ':';
             oProxyPass.hostname = serverInfo[1];
             oProxyPass.port = serverInfo[2];
-            console.log(oProxyPass);
+            // console.log(oProxyPass);
         }
     }
     const httpreq_options = {

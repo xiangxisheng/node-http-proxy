@@ -40,6 +40,8 @@ module.exports = (oFun, config, buffer, httpreq_res, httpsrv_res, oResHeader, ht
             return;
         }
         oResHeader.set('content-length', encoded.length);
+        // 使用content-length时，应该设置Transfer-Encoding为identity，而不能是chunked
+        oResHeader.set('Transfer-Encoding', 'identity'); 
         try {
             httpsrv_res.writeHead(httpreq_res.statusCode, httpreq_res.statusMessage, oResHeader.getAll());
         } catch (err) {
